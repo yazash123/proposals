@@ -9,19 +9,19 @@
     window.SITTING_BACKEND.ready.catch(function(){});
     return;
   }
-  var auth,db;
+  var auth,db,liveUid='';
   try{ if(!firebase.apps.length)firebase.initializeApp(C); auth=firebase.auth(); db=firebase.firestore(); }
   catch(e){ console.error('[sitting] Firebase failed to start',e); window.SITTING_BACKEND={ready:Promise.reject(e)}; window.SITTING_BACKEND.ready.catch(function(){}); return; }
   var ready=new Promise(function(resolve,reject){
     var done=false;
     auth.onAuthStateChanged(function(u){
-      if(u){ if(!done){done=true;resolve({db:db,uid:u.uid,host:u.email===HOST});} }
+      if(u){ liveUid=u.uid; if(window.SITTING_BACKEND)window.SITTING_BACKEND.uid=u.uid; if(!done){done=true;resolve({db:db,uid:u.uid,host:u.email===HOST});} }
       else auth.signInAnonymously().catch(function(e){ console.error('[sitting] anonymous sign-in failed: is it switched on in the Firebase console?',e); if(!done){done=true;reject(e);} });
     });
     setTimeout(function(){ if(!done){done=true;reject(new Error('Firebase sign-in timed out'));} },12000);
   });
   window.SITTING_BACKEND={
-    ready:ready,
+    ready:ready, uid:liveUid,
     hostSignIn:function(pass){ return auth.signInWithEmailAndPassword(HOST,pass).then(function(){return true;},function(){return false;}); },
     hostSignOut:function(){ return auth.signOut(); }
   };

@@ -2117,7 +2117,7 @@ var Win=(function(){
       at:old?old.at:now,upd:now,st:'live',src:old?old.src||'web':(S.host?'paper':'web')};
     if(f.on&&PBY(f.on)){p.on=f.on;if(f.alt)p.alt=true;}else if(old&&old.on){p.on=old.on;if(old.alt)p.alt=true;}
     if(f.who&&WHOBY[f.who]&&(f.who!=='other'||whoName('other',f.whoX))){p.who=f.who;if(f.who==='other')p.whoX=whoName('other',f.whoX);}if(f.by&&WHENBY[f.by])p.by=f.by;
-    var author=old?null:{id:p.id,uid:S.me.uid,name:S.host?paper.replace(/\s+/g,' '):S.me.name,mk:S.host?'paper':(S.me.key||'unchecked'),at:now};if(author&&!S.host&&S.me.m)author.m=S.me.m;
+    var author=old?null:{id:p.id,uid:(window.SITTING_BACKEND&&window.SITTING_BACKEND.uid)||S.me.uid,name:S.host?paper.replace(/\s+/g,' '):S.me.name,mk:S.host?'paper':(S.me.key||'unchecked'),at:now};if(author&&!S.host&&S.me.m)author.m=S.me.m;
     var btn=$('[data-a="send"]',el);if(btn){btn.disabled=true;btn.textContent='Sending…';}
     S.sending=true;setMsg(null);
     var slow=setTimeout(function(){if(S.sending)setMsg('warn','Still sending. Keep this page open until it says your proposal is in the wall.');},9000);
