@@ -8,3 +8,7 @@ Only the drafting page is open. The full page for the sitting replaces these fil
 - `hosted.js` connects the page to Firebase.
 
 Hosts open the page with `#hosts` on the end of the address.
+
+## Webflow
+
+`webflow-embed.html` is the snippet for the page at houseofthepeople.uk/proposals. Paste all of it into one Code Embed, placed in a full-width section (not a Container), then publish the site. It loads this page from GitHub Pages in a frame and passes on `#hosts` from the address bar, so `houseofthepeople.uk/proposals#hosts` opens the hosts' sign-in.
