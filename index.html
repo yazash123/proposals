@@ -1215,6 +1215,9 @@ body.hw #wip{pointer-events:none}
 body.hw .tab[data-tab="wall"],body.hw .tab[data-tab="tryouts"]{display:none!important}
 body.hw:not(.hosty) .tabs{display:none}
 body.hw .lg-group{margin-left:auto}
+
+/* the member chooser in the hosts’ carry-over table */
+.lgtable select{font:inherit;font-size:14px;padding:4px 8px;border-radius:6px;margin-right:10px;max-width:220px}
 </style>
 </head>
 <body class="hw">
@@ -1517,7 +1520,7 @@ var Store=(function(){
   }
   function hostListen(){
     if(!db)return;
-    unsub.push(db.collection(P+'authors').onSnapshot(function(snap){S.authors={};snap.docs.forEach(function(d){var a=d.data();if(a&&typeof a.id==='string'&&IDRE.test(a.id))S.authors[a.id]={id:a.id,name:String(a.name||'').slice(0,80),mk:String(a.mk||''),uid:String(a.uid||''),m:String(a.m||'')};});Hosts.render();},function(){}));
+    unsub.push(db.collection(P+'authors').onSnapshot(function(snap){S.authors={};snap.docs.forEach(function(d){var a=d.data();if(a&&typeof a.id==='string'&&IDRE.test(a.id))S.authors[a.id]={id:a.id,name:String(a.name||'').slice(0,80),mk:String(a.mk||''),uid:String(a.uid||''),m:String(a.m||''),at:+a.at||0};});Hosts.render();},function(){}));
     unsub.push(db.collection(P+'members').onSnapshot(function(snap){S.members={};snap.docs.forEach(function(d){var a=d.data();if(a&&typeof a.m==='string')S.members[a.m]={m:a.m,name:String(a.name||'').slice(0,80),s:String(a.s||''),pw:String(a.pw||''),at:+a.at||0};});if(S.tab==='hosts')Hosts.render();},function(){}));
     if(!S.draftReady)db.doc(P+'integration/draft').get().then(function(snap){var d=data(snap);if(d&&d.groups&&!S.draftDirty)S.draft=d;S.draftReady=true;Hosts.render();}).catch(function(){S.draftReady=true;Hosts.render();});
   }
@@ -1556,7 +1559,14 @@ var Store=(function(){
     /* a member's own list of proposal ids, kept under a secret only their sign-in reveals, so it follows them to another device */
     mineSync:function(){if(!db||!S.me.s)return Promise.resolve();return db.doc(P+'mine/'+S.me.s).get().then(function(s){var d=s&&s.exists!==false&&s.data?s.data():null,ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
       ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}}).catch(function(){});},
-    mineSave:function(){if(!db||!S.me.s)return;db.doc(P+'mine/'+S.me.s).set({ids:S.mine.slice(-200),at:Date.now()}).catch(function(){});},
+    mineSave:function(){if(!db||!S.me.s)return;var ref=db.doc(P+'mine/'+S.me.s);ref.get().then(function(s){var d=data(s),ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
+      ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}},function(){}).then(function(){return ref.set({ids:S.mine.slice(-200),at:Date.now()});}).catch(function(){});},
+    /* hosts: proposals sent under a typed name, before that member had a login, go onto the member's own list, and each author record notes the member */
+    carry:function(mem,ids){if(!db||!mem||!mem.s||!mem.m||!ids.length)return Promise.resolve(0);var ref=db.doc(P+'mine/'+mem.s);
+      return ref.get().then(function(s){var d=data(s),have=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],n=0;
+        ids.forEach(function(x){if(have.indexOf(x)<0){have.push(x);n++;}});return n?ref.set({ids:have.slice(-200),at:Date.now()}):null;})
+      .then(function(){var i=0;return (function next(){if(i>=ids.length)return ids.length;var a=S.authors[ids[i++]];if(!a)return next();
+        return db.doc(P+'authors/'+a.id).set({id:a.id,uid:a.uid,name:a.name,mk:a.mk,at:a.at||Date.now(),m:mem.m}).then(next);})();});},
     /* logins: each member gets two entries on the scrambled list, one under their own password and one under the universal one */
     pwKey:function(pw){return sha('code|'+normPw(pw));},
     allKey:function(pw){return sha('all|'+normPw(pw));},
@@ -1986,13 +1996,14 @@ var Win=(function(){
       body.innerHTML=head+'<p class="notice">'+C('closed')+'</p><div><button type="button" class="btn" data-a="wall">'+icon('wall')+C('seeWall')+'</button></div>';
     }else if(!S.ready&&!S.host&&!S.form.editId&&!S.form.on&&!(S.form.text||'').trim()){
       body.innerHTML='<div class="pintro">'+head+'<button type="button" class="btn lgb ready" data-a="ready">'+C('ready')+'</button></div>';
-    }else if(!S.me.name&&!S.host){
-      var code=load('sit-code','');
+    }else if((!S.me.name||needPw())&&!S.host){
+      var code=load('sit-code',''),again=needPw();
       body.innerHTML='<form id="namef" class="tags pname" novalidate><div><h3 style="font-family:var(--font-serif);font-weight:600;font-size:26px;line-height:1.1;text-align:center">'+C('nameH')+'</h3><p style="font-size:14.5px;line-height:1.45;color:var(--soft);margin-top:10px;text-align:center">'+C('nameP')+'</p></div>'+
-        '<div><label class="fl" for="n-name">'+C('nameL')+'</label><input id="n-name" class="field" maxlength="80" autocomplete="name" autocapitalize="words" spellcheck="false"></div>'+
+        '<div><label class="fl" for="n-name">'+C('nameL')+'</label><input id="n-name" class="field" maxlength="80" autocomplete="name" autocapitalize="words" spellcheck="false"'+(again?' value="'+esc(S.me.name)+'"':'')+'></div>'+
         (S.cfg.roster&&S.cfg.pw?'<div><label class="fl" for="n-code">Your password <span class="opt">your own, or the one the hosts gave everyone</span></label><input id="n-code" class="field" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></div>'
           :S.cfg.roster&&S.cfg.code&&!code?'<div><label class="fl" for="n-code">House code <span class="opt">from your email</span></label><input id="n-code" class="field" autocomplete="off" autocapitalize="none" spellcheck="false"></div>':'')+
         (S.mode!=='hosted'&&!S.cfg.roster?'<p style="font-size:13.5px;color:var(--faint)">Preview: any name works here. Sign out and come back under another name to see the page as a different member.</p>':'')+
+        (again?'<p class="notice">Members now sign in with a password. Type yours to carry on. The proposals you have already sent come with you.</p>':'')+
         '<p class="notice" id="n-msg" hidden></p><div><button class="btn" type="submit">'+C('carryOn')+'</button></div></form>';
     }else{
       var f=S.form,ed=f.editId&&PBY(f.editId),on=f.on&&PBY(f.on);
@@ -2055,10 +2066,15 @@ var Win=(function(){
     else if(a==='wall')Boot.tab('wall');
     else Wall.act(a,b);
   }
+  /* signed in by name alone, before passwords were turned on */
+  function needPw(){return !!(S.cfg.roster&&S.cfg.pw&&S.me.name&&!S.me.s&&S.me.key==='unchecked'&&!S.me.pw);}
   function setMe(name,key,ok,info){name=name.replace(/\s+/g,' ');
-    (info&&info.m?Promise.resolve(String(info.m)):memberId(name)).then(function(m){S.me.name=name;S.me.key=key;S.me.ok=ok;S.me.m=m;S.me.s=info&&info.s?String(info.s):'';save('sit-me',S.me);loadMine();Store.mineSync();render();fadeIn();Boot.onData();var t=$('#f-text');if(t)t.focus();});}
+    var was=S.me.name&&S.me.key==='unchecked'&&!S.me.s&&S.me.m?{m:S.me.m,n:normName(S.me.name)}:null;
+    (info&&info.m?Promise.resolve(String(info.m)):memberId(name)).then(function(m){S.me.name=name;S.me.key=key;S.me.ok=ok;S.me.m=m;S.me.s=info&&info.s?String(info.s):'';S.me.pw=!!S.cfg.pw;save('sit-me',S.me);loadMine();
+      if(was&&S.me.s&&was.m!==m&&was.n===normName(name)){var had=load('sit-mine:'+was.m,[]),ch=false;(Array.isArray(had)?had:[]).forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Store.mineSave();}}
+      Store.mineSync();render();fadeIn();Boot.onData();var t=$('#f-text');if(t)t.focus();});}
   function fadeIn(){if(!body)return;body.classList.remove('fadein');void body.offsetWidth;body.classList.add('fadein');}
-  function signOut(){S.me.name='';S.me.key='';S.me.ok=false;S.me.m='';S.me.s='';save('sit-me',S.me);loadMine();resetForm();S.winTab='write';render();Boot.onData();}
+  function signOut(){S.me.name='';S.me.key='';S.me.ok=false;S.me.m='';S.me.s='';S.me.pw=false;save('sit-me',S.me);loadMine();resetForm();S.winTab='write';render();Boot.onData();}
   function mineLabel(){var mb=$('#meBtn');if(mb)mb.classList.toggle('in',!!S.me.name);var c=$('#mine-n');if(!c)return;var n=liveProps().filter(isMine).length,nw=newForMe();c.innerHTML=(n?'('+n+')':'')+(nw?' <span class="newpill">'+nw+' new</span>':'');}
   function checkName(){
     var name=$('#n-name').value.trim(),m=$('#n-msg'),codeEl=$('#n-code'),code=codeEl?codeEl.value.trim():(S.cfg.pw?'':load('sit-code',''));
@@ -2159,7 +2175,10 @@ var Win=(function(){
     reword:function(p){stash();var rest=afterWho(p);S.form={text:rest===null?p.text:rest,who:p.who||'',whoX:p.whoX||'',by:p.by||'',why:'',risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),editId:null,on:p.id,alt:true};S.winTab='write';msg=null;save('sit-form',S.form);tuck(false);render();Map_.paint();var t=$('#f-text');if(t)t.focus();},
     signOut:signOut,signIn:function(){S.ready=true;try{sessionStorage.setItem('sit-ready','1');}catch(e){}S.winTab='write';tuck(false);render();place();var n=$('#n-name')||$('#f-text');if(n)n.focus();},
     sync:function(){mineLabel();var fn=$('#f-note');if(fn){fn.textContent=S.cfg.note||'';fn.hidden=!S.cfg.note;}
-      var closedNow=!S.cfg.open&&!S.host,shown=!!$('#f-text',body)||!!$('#namef',body);if(S.winTab==='mine'||(closedNow&&shown)||(!closedNow&&!shown&&S.winTab==='write'))render();}};
+      var closedNow=!S.cfg.open&&!S.host,shown=!!$('#f-text',body)||!!$('#namef',body);
+      /* passwords were turned on while this page was open: ask for it now, keeping whatever name is typed */
+      if(S.cfg.roster&&S.cfg.pw&&!S.host&&!closedNow&&!S.tagging&&S.winTab==='write'&&((needPw()&&$('#f-text',body))||($('#namef',body)&&!$('#n-code',body)))){var nv=$('#n-name',body);nv=nv?nv.value:'';render();var ne=$('#n-name',body);if(ne&&nv)ne.value=nv;return;}
+      if(S.winTab==='mine'||(closedNow&&shown)||(!closedNow&&!shown&&S.winTab==='write'))render();}};
 })();
 
 /* ============================================================
@@ -2408,7 +2427,18 @@ var Hosts=(function(){
     liveProps().forEach(function(p){if(!inG[p.id]){var it={type:'p',id:p.id,no:NO[p.id],text:p.text,why:p.why||'',risks:p.risks||[],drivers:p.drivers||[],home:homeOf(p),src:p.src||'web'};if(p.who)it.who=p.who;if(p.by)it.by=p.by;items.push(it);}});
     return {v:(S.integ&&S.integ.v||0)+1,at:Date.now(),items:items,log:log};
   }
-  function who(p){var a=S.authors[p.id];if(p.ex)return 'Example';if(!a)return 'Name not loaded';return esc(a.name)+(a.mk==='paper'?' · on paper':a.mk==='unchecked'?' · <b style="color:#C0184F">name not checked</b>':a.m&&a.m.charAt(0)==='u'&&S.cfg.pw?' · <b style="color:#8A4B00">signed in with the everyone password</b>':' · signed in');}
+  /* proposals sent under a typed name with no login behind them: before logins were made, or with the everyone password */
+  function loose(){var by={},mem={},dup={};Object.keys(S.members).forEach(function(k){if(k==='_all')return;var n=normName(S.members[k].name);if(mem[n])dup[n]=1;mem[n]=S.members[k];});
+    S.props.forEach(function(p){var a=S.authors[p.id];if(p.ex||!a||a.mk==='paper'||(a.m&&S.members[a.m]))return;var n=normName(a.name);(by[n]=by[n]||{n:n,name:a.name,ids:[],to:dup[n]?null:mem[n]||null}).ids.push(p.id);});
+    return Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});}
+  function looseHTML(){if(!S.cfg.pw)return '';var L=loose();if(!L.length)return '';
+    var hit=L.filter(function(x){return x.to;}),miss=L.filter(function(x){return !x.to;}),nh=hit.reduce(function(s,x){return s+x.ids.length;},0),
+      ms=Object.keys(S.members).filter(function(k){return k!=='_all';}).map(function(k){return S.members[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    return '<div class="logins"><h4>Sent without a login</h4><p style="font-size:14px;color:var(--soft);max-width:70ch">Proposals sent under a typed name, before logins were made or with the everyone password. Carrying one over puts it under “Yours” for that member when they sign in.</p>'+
+      (hit.length?'<div class="rowf"><span style="font-size:14px">'+nh+(nh===1?' proposal matches':' proposals match')+' a login by name.</span><button type="button" class="btn sm" data-a="carry">Carry '+(nh===1?'it':'them')+' over</button></div>':'')+
+      (miss.length?'<p style="font-size:14px;max-width:70ch">'+(miss.length===1?'This name matches':'These names match')+' no login. Choose the member '+(miss.length===1?'it belongs':'each belongs')+' to.</p><div class="lgtable"><table><tbody>'+miss.map(function(x){var cur=SU['give:'+x.n]||'';
+        return '<tr><td>'+esc(x.name)+'</td><td>'+x.ids.length+(x.ids.length===1?' proposal':' proposals')+'</td><td><select data-give="'+esc(x.n)+'" aria-label="The member '+esc(x.name)+' is"><option value="">Choose a member</option>'+ms.map(function(y){return '<option value="'+esc(y.m)+'"'+(cur===y.m?' selected':'')+'>'+esc(y.name)+'</option>';}).join('')+'</select> <button type="button" class="link" data-a="give" data-n="'+esc(x.n)+'">Carry over</button></td></tr>';}).join('')+'</tbody></table></div>':'')+'</div>';}
+  function who(p){var a=S.authors[p.id];if(p.ex)return 'Example';if(!a)return 'Name not loaded';return esc(a.name)+(a.mk==='paper'?' · on paper':a.mk==='unchecked'&&a.m&&S.members[a.m]?' · sent before logins, now under their login':a.mk==='unchecked'?' · <b style="color:#C0184F">name not checked</b>':a.m&&a.m.charAt(0)==='u'&&S.cfg.pw?' · <b style="color:#8A4B00">signed in with the everyone password</b>':' · signed in');}
   function hp(p,o){
     o=o||{};var g=grouped()[p.id];
     return '<div class="hp'+(g?' in':'')+'"><input type="checkbox" data-sel="'+esc(p.id)+'"'+(S.sel[p.id]?' checked':'')+(g?' disabled':'')+' aria-label="Choose proposal '+NO[p.id]+'">'+
@@ -2491,7 +2521,7 @@ var Hosts=(function(){
       '<div class="rowf"><button type="button" class="btn sm" data-a="roster">Make logins for these names</button><span id="ro-msg" style="font-size:14px">'+(S.cfg.pw?'Sign-in is on: members need their password.':S.cfg.roster?(S.cfg.rosterN||'')+' names on the old list, checked'+(S.cfg.code?' with the House code.':'.'):'No logins yet, so any name is accepted.')+'</span></div>'+
       '<div class="rowf"><div><label class="fl" for="ro-code">A password that works for everyone <span class="opt">break glass: someone using it types their name and can send proposals, and hosts see it was used</span></label><input class="field" id="ro-code" autocomplete="off" style="max-width:260px" value="'+esc(SU['ro-code']!=null?SU['ro-code']:((S.members._all||{}).pw||''))+'"></div><button type="button" class="btn sm line" data-a="univ" style="align-self:flex-end">Save it</button></div>'+
       (function(){var ms=Object.keys(S.members).filter(function(k){return k!=='_all';}).map(function(k){return S.members[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});if(!ms.length)return '';
-        return '<div class="rowf"><b style="font-size:14px">'+ms.length+' logins</b><button type="button" class="btn sm line" data-a="copylogins">Copy names and passwords</button><span id="lg-msg" style="font-size:14px"></span></div><div class="lgtable"><table><tbody>'+ms.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td><code>'+esc(x.pw)+'</code></td><td><button type="button" class="link" data-a="newpw" data-m="'+esc(x.m)+'">New password</button></td></tr>';}).join('')+'</tbody></table></div>';})()+'</div>'+
+        return '<div class="rowf"><b style="font-size:14px">'+ms.length+' logins</b><button type="button" class="btn sm line" data-a="copylogins">Copy names and passwords</button><span id="lg-msg" style="font-size:14px"></span></div><div class="lgtable"><table><tbody>'+ms.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td><code>'+esc(x.pw)+'</code></td><td><button type="button" class="link" data-a="newpw" data-m="'+esc(x.m)+'">New password</button></td></tr>';}).join('')+'</tbody></table></div>';})()+'</div>'+looseHTML()+
 
       '<p>A proposal on paper: write it in the Propose tab. While you are signed in as a host, the form asks for the member’s name and marks the brick “On paper”.</p>'+
       '<div class="rowf"><button type="button" class="btn sm line" data-a="copycsv">Copy everything as a table</button>'+(S.mode==='claude'?'':'<button type="button" class="btn sm line" data-a="dlcsv">Download as a CSV file</button>')+
@@ -2505,6 +2535,7 @@ var Hosts=(function(){
   function onInput(e){if(e.target.id&&/^(ro-names|ro-code|cfg-note)$/.test(e.target.id)){SU[e.target.id]=e.target.value;return;}var f=e.target.dataset.f,g=f&&G(e.target);if(!g||f==='home')return;g[f]=e.target.value;touch();}
   function onChange(e){
     var t=e.target;
+    if(t.dataset.give!=null){SU['give:'+t.dataset.give]=t.value;return;}
     if(t.dataset.sel){if(t.checked)S.sel[t.dataset.sel]=1;else delete S.sel[t.dataset.sel];render();return;}
     var g=t.dataset.f&&G(t);if(g){g[t.dataset.f]=t.value;touch();render();}
   }
@@ -2541,8 +2572,20 @@ var Hosts=(function(){
       var have={};Object.keys(S.members).forEach(function(k){have[normName(S.members[k].name)]=1;});var fresh=names.filter(function(n){var k=normName(n);if(have[k])return false;have[k]=1;return true;});
       if(!fresh.length){m.textContent=names.length?'Those names already have logins.':'Paste at least one full name first.';return;}
       m.textContent='Making '+fresh.length+' logins…';b.disabled=true;var i=0;
-      (function next(){if(i>=fresh.length)return Promise.resolve();var mem={m:'m'+rid(10),name:fresh[i++].slice(0,80),s:rid(24),pw:newPassword(),at:Date.now()};return Store.saveLogin(mem).then(next);})()
-        .then(function(){return Store.saveConfig({roster:true,pw:true,code:false,rosterN:Object.keys(S.members).length});}).then(function(){SU['ro-names']='';render();Boot.toast(fresh.length+' logins made.');}).catch(function(){m.textContent='That didn’t save. Try again.';b.disabled=false;});
+      var made=[];
+      (function next(){if(i>=fresh.length)return Promise.resolve();var mem={m:'m'+rid(10),name:fresh[i++].slice(0,80),s:rid(24),pw:newPassword(),at:Date.now()};made.push(mem);return Store.saveLogin(mem).then(next);})()
+        .then(function(){return Store.saveConfig({roster:true,pw:true,code:false,rosterN:Object.keys(S.members).length});})
+        .then(function(){ /* anything already sent under one of these names goes with the new login */
+          var L=loose(),j=0,tot=0;return (function nx(){if(j>=made.length)return tot;var mem=made[j++],g=L.filter(function(x){return x.n===normName(mem.name);})[0];if(!g)return nx();return Store.carry(mem,g.ids).then(function(){tot+=g.ids.length;return nx();});})().catch(function(){return -1;});})
+        .then(function(tot){SU['ro-names']='';render();Boot.toast(fresh.length+' logins made.'+(tot>0?' '+tot+(tot===1?' earlier proposal':' earlier proposals')+' carried over.':tot<0?' Carrying earlier proposals over didn’t finish: use the button under the list.':''));}).catch(function(){m.textContent='That didn’t save. Try again.';b.disabled=false;});
+    }
+    else if(a==='carry'||a==='give'){
+      var LL=loose(),jobs=[];
+      if(a==='carry')LL.forEach(function(x){if(x.to)jobs.push([x.to,x.ids]);});
+      else{var gg=LL.filter(function(x){return x.n===b.dataset.n;})[0],sl=b.closest('tr').querySelector('select'),mm=sl&&S.members[sl.value];if(!gg||!mm){Boot.toast('Choose the member first.');return;}jobs.push([mm,gg.ids]);delete SU['give:'+gg.n];}
+      if(!jobs.length)return;b.disabled=true;var ji=0,jt=0;
+      (function nx(){if(ji>=jobs.length)return Promise.resolve();var jb=jobs[ji++];return Store.carry(jb[0],jb[1]).then(function(){jt+=jb[1].length;return nx();});})()
+        .then(function(){Boot.toast(jt+(jt===1?' proposal':' proposals')+' carried over.');render();}).catch(function(){Boot.toast('That didn’t save. Try again.');b.disabled=false;});
     }
     else if(a==='univ'){var up=$('#ro-code').value.trim();if(up&&normPw(up).length<6){Boot.toast('Make it at least six letters.');return;}Store.saveUniversal(up,(S.members._all||{}).pw).then(function(){delete SU['ro-code'];Boot.toast(up?'Saved. It works for everyone now.':'Removed.');render();});}
     else if(a==='newpw'){var mem=S.members[b.dataset.m];if(!mem)return;var old=mem.pw;Store.saveLogin(Object.assign({},mem,{pw:newPassword(),at:Date.now()}),old).then(function(){Boot.toast('New password for '+mem.name+'. The old one no longer works.');});}
