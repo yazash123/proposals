@@ -1218,6 +1218,10 @@ body.hw .lg-group{margin-left:auto}
 
 /* the member chooser in the hosts’ carry-over table */
 .lgtable select{font:inherit;font-size:14px;padding:4px 8px;border-radius:6px;margin-right:10px;max-width:220px}
+
+/* homework: the foot of the map carries no label, only the bricks as they arrive */
+body.hw #wip .wl{display:none}
+.hp .meta .hdown{margin-left:auto;font-size:13px}
 </style>
 </head>
 <body class="hw">
@@ -1550,9 +1554,14 @@ var Store=(function(){
     },
     saveConfig:function(patch){var c=Object.assign({},S.cfg,patch,{stamp:Date.now()});S.cfg=c;return db.doc(P+'config/main').set(c);},
     saveCopy:function(k,v){if(!db)return Promise.reject(new Error('offline'));var ref=db.doc(P+'copy/'+k.replace(/[^A-Za-z0-9_-]/g,'_'));return v==null?ref.delete():ref.set({k:k,v:v,at:Date.now()});},
-    canEdit:function(){return canEd||(S.mode==='hosted'&&S.host);},
+    canEdit:function(){return canEd&&S.mode!=='hosted';},   /* the pages on the website have no Edit text: wording changes go through the build */
     saveDraft:function(){if(db&&S.draft)return db.doc(P+'integration/draft').set(S.draft).catch(function(){});},
     publish:function(snap){return db.doc(P+'integration/live').set(snap);},
+    /* hosts: remove every proposal for good, to clear out test ones before members start. Logins and settings stay. */
+    wipe:function(){if(!db)return Promise.reject(new Error('offline'));var ids={};S.props.forEach(function(p){if(!p.ex)ids[p.id]=1;});Object.keys(S.authors).forEach(function(k){ids[k]=1;});ids=Object.keys(ids);var i=0;
+      return (function next(){if(i>=ids.length)return Promise.resolve();var id=ids[i++];return db.doc(P+'proposals/'+id).delete().then(function(){return db.doc(P+'authors/'+id).delete();}).then(next);})()
+        .then(function(){S.draft={groups:[],dismissed:[],n:0};S.draftDirty=false;S.sel={};return db.doc(P+'integration/draft').delete().catch(function(){});})
+        .then(function(){S.integ=null;return db.doc(P+'integration/live').delete().catch(function(){});}).then(function(){return ids.length;});},
     /* the name check: the list holds only scrambled names, so the page can ask "is this one on the list?" without ever holding the list */
     keyFor:function(name,code){return sha((code||'').trim().toLowerCase()+'|'+normName(name));},
     onRoster:function(key){return db.doc(P+'roster/'+key).get().then(function(s){var d=s&&s.exists!==false&&s.data?s.data():null;return d||null;});},
@@ -2141,7 +2150,7 @@ var Win=(function(){
       S.sending=false;clearTimeout(slow);
       if(!isMine(p)&&!S.host){S.mine.push(p.id);keepMine();Store.mineSave();}
       var i=S.props.map(function(x){return x.id;}).indexOf(p.id);if(i>=0)S.props[i]=p;else S.props.push(p);renumber();
-      resetForm();msg={k:'good',h:(old?'Saved. ':'It’s in the wall as brick #'+NO[p.id]+'. ')+'Got another? Write it here, or <button type="button" class="link" data-a="wall" style="color:inherit">see the wall so far</button>.'};
+      resetForm();msg={k:'good',h:(old?'Saved. ':document.body.classList.contains('hw')?'Sent. Thank you. ':'It’s in the wall as brick #'+NO[p.id]+'. ')+(document.body.classList.contains('hw')?'Got another? Write it here.':'Got another? Write it here, or <button type="button" class="link" data-a="wall" style="color:inherit">see the wall so far</button>.')};
       if(old||Map_.size().narrow||reduce){Boot.onData();render();if(!old)Boot.toast('Your proposal is in the wall.');}
       else fly(p);
     }).catch(function(){S.sending=false;clearTimeout(slow);if(btn){btn.disabled=false;btn.textContent=old?COPY.saveEdit:COPY.send;}
@@ -2443,7 +2452,7 @@ var Hosts=(function(){
     o=o||{};var g=grouped()[p.id];
     return '<div class="hp'+(g?' in':'')+'"><input type="checkbox" data-sel="'+esc(p.id)+'"'+(S.sel[p.id]?' checked':'')+(g?' disabled':'')+' aria-label="Choose proposal '+NO[p.id]+'">'+
       '<div class="tx">'+(o.mark?lcsMark(o.mark,p.text):esc(p.text))+'</div>'+
-      '<div class="meta"><b>#'+NO[p.id]+'</b><span>'+who(p)+'</span><span>'+clock(p.at)+'</span>'+(p.on&&NO[p.on]?'<span>builds on #'+NO[p.on]+'</span>':'')+(g?'<span class="ingrp">In '+gname(g)+'</span>':'')+'</div>'+
+      '<div class="meta"><b>#'+NO[p.id]+'</b><span>'+who(p)+'</span><span>'+clock(p.at)+'</span>'+(p.on&&NO[p.on]?'<span>builds on #'+NO[p.on]+'</span>':'')+(g?'<span class="ingrp">In '+gname(g)+'</span>':'')+(p.ex?'':'<button type="button" class="link hdown" data-a="hdown" data-id="'+esc(p.id)+'">'+(S.sureDown===p.id?'Sure? Yes, take it down':'Take down')+'</button>')+'</div>'+
       (p.why?'<div class="why">'+esc(p.why)+'</div>':'')+
       '<div class="chips">'+(p.who&&WHOBY[p.who]?'<span class="chip dark ask">Asks: '+esc(WHOBY[p.who].l)+'</span>':'')+(p.by&&WHENBY[p.by]?'<span class="chip dark ask">'+esc(WHENBY[p.by].l)+'</span>':'')+(p.risks||[]).map(function(r){return riskChip(r,true);}).join('')+(p.drivers||[]).map(function(d){return drvChip(d,true);}).join('')+'</div>'+
       (hasRb(p)?'<details class="hrb"><summary>As the House would vote on it</summary><p class="rb">'+readback(p)+'</p></details>':'')+'</div>';
@@ -2523,6 +2532,9 @@ var Hosts=(function(){
       (function(){var ms=Object.keys(S.members).filter(function(k){return k!=='_all';}).map(function(k){return S.members[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});if(!ms.length)return '';
         return '<div class="rowf"><b style="font-size:14px">'+ms.length+' logins</b><button type="button" class="btn sm line" data-a="copylogins">Copy names and passwords</button><span id="lg-msg" style="font-size:14px"></span></div><div class="lgtable"><table><tbody>'+ms.map(function(x){return '<tr><td>'+esc(x.name)+'</td><td><code>'+esc(x.pw)+'</code></td><td><button type="button" class="link" data-a="newpw" data-m="'+esc(x.m)+'">New password</button></td></tr>';}).join('')+'</tbody></table></div>';})()+'</div>'+looseHTML()+
 
+      (function(){var n=S.props.filter(function(p){return !p.ex;}).length;if(!n)return '';
+        return '<div class="logins"><h4>Start afresh</h4><p style="font-size:14px;color:var(--soft);max-width:70ch">Removes every proposal for good, including any taken down: for clearing out test proposals before members start. It cannot be undone. Logins and the settings above stay as they are. Download the table first if you want a record.</p>'+
+          '<div class="rowf"><div><label class="fl" for="wipe-w">Type CLEAR to confirm</label><input class="field" id="wipe-w" autocomplete="off" autocapitalize="characters" spellcheck="false" style="max-width:180px" value="'+esc(SU['wipe-w']||'')+'"></div><button type="button" class="btn sm line" data-a="wipe" style="align-self:flex-end">Remove '+(n===1?'the 1 proposal':'all '+n+' proposals')+'</button><span id="wipe-msg" style="font-size:14px;align-self:flex-end"></span></div></div>';})()+
       '<p>A proposal on paper: write it in the Propose tab. While you are signed in as a host, the form asks for the member’s name and marks the brick “On paper”.</p>'+
       '<div class="rowf"><button type="button" class="btn sm line" data-a="copycsv">Copy everything as a table</button>'+(S.mode==='claude'?'':'<button type="button" class="btn sm line" data-a="dlcsv">Download as a CSV file</button>')+
       (S.mode==='hosted'?'<button type="button" class="btn sm line" data-a="signout">Leave host mode on this device</button>':'')+(S.mode!=='hosted'?'<button type="button" class="btn sm line" data-a="examples">'+(S.examples?'Remove the example proposals':'Load example proposals (this browser only)')+'</button><button type="button" class="btn sm line" data-a="examples100">'+(S.exMany?'Back to 17 examples':'Fill the wall: 100 examples')+'</button>':'')+'<span id="csv-msg" style="font-size:14px"></span></div></div></details>';
@@ -2532,7 +2544,7 @@ var Hosts=(function(){
     window.scrollTo(0,sy);
   }
   function G(el){var c=el.closest('[data-g]');if(!c)return null;var id=c.dataset.g;return draft().groups.filter(function(g){return g.id===id;})[0];}
-  function onInput(e){if(e.target.id&&/^(ro-names|ro-code|cfg-note)$/.test(e.target.id)){SU[e.target.id]=e.target.value;return;}var f=e.target.dataset.f,g=f&&G(e.target);if(!g||f==='home')return;g[f]=e.target.value;touch();}
+  function onInput(e){if(e.target.id&&/^(ro-names|ro-code|cfg-note|wipe-w)$/.test(e.target.id)){SU[e.target.id]=e.target.value;return;}var f=e.target.dataset.f,g=f&&G(e.target);if(!g||f==='home')return;g[f]=e.target.value;touch();}
   function onChange(e){
     var t=e.target;
     if(t.dataset.give!=null){SU['give:'+t.dataset.give]=t.value;return;}
@@ -2579,6 +2591,12 @@ var Hosts=(function(){
           var L=loose(),j=0,tot=0;return (function nx(){if(j>=made.length)return tot;var mem=made[j++],g=L.filter(function(x){return x.n===normName(mem.name);})[0];if(!g)return nx();return Store.carry(mem,g.ids).then(function(){tot+=g.ids.length;return nx();});})().catch(function(){return -1;});})
         .then(function(tot){SU['ro-names']='';render();Boot.toast(fresh.length+' logins made.'+(tot>0?' '+tot+(tot===1?' earlier proposal':' earlier proposals')+' carried over.':tot<0?' Carrying earlier proposals over didn’t finish: use the button under the list.':''));}).catch(function(){m.textContent='That didn’t save. Try again.';b.disabled=false;});
     }
+    else if(a==='hdown'){var hpp=S.props.filter(function(x){return x.id===b.dataset.id;})[0];if(!hpp)return;
+      if(S.sureDown!==hpp.id){S.sureDown=hpp.id;b.textContent='Sure? Yes, take it down';return;}S.sureDown=null;b.disabled=true;
+      Store.saveProposal(Object.assign({},hpp,{st:'gone',upd:Date.now()}),null).then(function(){Boot.toast('Taken down. It stays in the downloaded table.');render();Boot.onData();}).catch(function(){Boot.toast('That didn’t save. Try again.');render();});}
+    else if(a==='wipe'){var ww=$('#wipe-w'),wm=$('#wipe-msg');if(!ww||ww.value.trim().toUpperCase()!=='CLEAR'){wm.textContent='Type CLEAR in the box first.';if(ww)ww.focus();return;}
+      b.disabled=true;wm.textContent='Removing…';delete SU['wipe-w'];
+      Store.wipe().then(function(k){Boot.toast(k+(k===1?' proposal':' proposals')+' removed. The page is empty again.');render();Boot.onData();}).catch(function(){wm.textContent='That didn’t finish. Try again.';b.disabled=false;});}
     else if(a==='carry'||a==='give'){
       var LL=loose(),jobs=[];
       if(a==='carry')LL.forEach(function(x){if(x.to)jobs.push([x.to,x.ids]);});
