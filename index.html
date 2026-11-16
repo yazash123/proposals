@@ -1533,7 +1533,10 @@ var Store=(function(){
   return {
     start:function(){
       back=window.SITTING_BACKEND;
-      if(back&&back.ready){S.mode='hosted';pending=false;back.ready.then(function(x){if(x.uid)S.me.uid=x.uid;if(x.host)S.host=true;attach(x.db);}).catch(function(){S.offline=true;Boot.modeNote();});}
+      if(back&&back.ready){S.mode='hosted';pending=false;var join=function(x){if(x.uid)S.me.uid=x.uid;if(x.host)S.host=true;attach(x.db);};
+        back.ready.then(join,function(){S.offline=true;Boot.modeNote();
+          /* the sign-in can still arrive after the wait ran out: carry on when it does */
+          back.late=function(x){S.offline=false;Boot.modeNote();join(x);};});}
       else if(window.claude&&window.claude.use){
         Promise.all([window.claude.use('db'),window.claude.use('user')]).then(function(r){
           if(!r[0]){useLocal();return;}
