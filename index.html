@@ -1346,7 +1346,7 @@ var COPY={
   whyL:'Your reasoning', whyOpt:'two short paragraphs at most', whyP:'Why this, and why now? This is where the reason goes.',
   tagsL:'Which risks and drivers does it address?', tagsNone:'None chosen yet.', tagsBtn:'Choose them on the map',
   send:'Add it to the wall', saveEdit:'Save my changes',
-  nameH:'First, your full name', nameP:'We check it against the list of House members, so every proposal has a member behind it. Other members will not see your name next to your proposal. The hosts will.',
+  nameH:'First, your full name', nameP:'Use the same full name every time. It is how this page finds your proposals again, on any phone or computer. Other members will not see your name next to your proposal. The hosts will.', nameP2:'We check it against the list of House members, so every proposal has a member behind it. Other members will not see your name next to your proposal. The hosts will.',
   closed:'Proposals are closed for now. You can still read the wall so far.',
   tagbar:'Tap every risk and driver your proposal addresses.',
   wallH:'the <b>wall</b> so far', wallLead:'Every brick is one proposal, in the words of the member who wrote it. Open a brick to read the reasoning and the risks it speaks to.',
@@ -1459,6 +1459,10 @@ var NO={};function renumber(){NO={};S.props.slice().sort(function(a,b){return a.
 function isMine(p){return S.mine.indexOf(p.id)>=0;}
 /* who is signed in on this device. A member is the same member on any device: their proposals follow the name they sign in with, not the browser. */
 function memberId(name){return sha('member|'+normName(name)).then(function(h){return 'u'+h.slice(0,16);});}
+/* Where a member's own list of proposals is kept on the server, so it comes back on any device: under their login's secret,
+   or, for a member signed in by name alone, under a scramble of the name (anyone who types that exact name gets the same list). */
+function nameMineKey(name){return sha('mine|'+normName(name)).then(function(h){return h.length>=20?h:'';});}
+function mineKey(){if(S.me.s)return Promise.resolve(S.me.s);if(!S.me.name||S.host)return Promise.resolve('');return nameMineKey(S.me.name);}
 function loadMine(){var m=S.me.m;if(!S.me.name||!m){S.mine=[];S.seen=[];return;}
   var old=load('sit-mine',null);S.mine=load('sit-mine:'+m,null)||(Array.isArray(old)?old:[]);if(old){try{localStorage.removeItem('sit-mine');}catch(e){}save('sit-mine:'+m,S.mine);}
   S.seen=load('sit-seen:'+m,[]);}
@@ -1507,7 +1511,7 @@ var Store=(function(){
   function attach(d){
     db=d;pending=false;S.live=true;
     listen();
-    if(S.me.s)setTimeout(function(){Store.mineSync();},0);
+    if(S.me.name&&!S.host)setTimeout(function(){Store.mineSync();},0);
     document.addEventListener('visibilitychange',function(){ /* a hidden tab stops listening, so it costs nothing */
       if(document.hidden){stop();}else if(!unsub.length){listen();}});
     Boot.modeNote();
@@ -1571,10 +1575,20 @@ var Store=(function(){
     keyFor:function(name,code){return sha((code||'').trim().toLowerCase()+'|'+normName(name));},
     onRoster:function(key){return db.doc(P+'roster/'+key).get().then(function(s){var d=s&&s.exists!==false&&s.data?s.data():null;return d||null;});},
     /* a member's own list of proposal ids, kept under a secret only their sign-in reveals, so it follows them to another device */
-    mineSync:function(){if(!db||!S.me.s)return Promise.resolve();return db.doc(P+'mine/'+S.me.s).get().then(function(s){var d=s&&s.exists!==false&&s.data?s.data():null,ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
-      ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}}).catch(function(){});},
-    mineSave:function(){if(!db||!S.me.s)return;var ref=db.doc(P+'mine/'+S.me.s);ref.get().then(function(s){var d=data(s),ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
-      ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}},function(){}).then(function(){return ref.set({ids:S.mine.slice(-200),at:Date.now()});}).catch(function(){});},
+    mineSync:function(){if(!db)return Promise.resolve();var m0=S.me.m;
+      return mineKey().then(function(k){if(!k)return;var ref=db.doc(P+'mine/'+k);return ref.get().then(function(s){if(S.me.m!==m0)return;var d=data(s),ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
+        ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}
+        /* this browser knows of some the server list lacks (sent before lists were kept by name): add them */
+        if(S.mine.some(function(x){return ids.indexOf(x)<0;}))return ref.set({ids:S.mine.slice(-200),at:Date.now()});});}).catch(function(){});},
+    mineSave:function(){if(!db)return;var m0=S.me.m;mineKey().then(function(k){if(!k)return;var ref=db.doc(P+'mine/'+k);return ref.get().then(function(s){if(S.me.m!==m0)return;var d=data(s),ids=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],ch=false;
+      ids.forEach(function(x){if(S.mine.indexOf(x)<0){S.mine.push(x);ch=true;}});if(ch){keepMine();Boot.onData();}},function(){}).then(function(){if(S.me.m!==m0)return;return ref.set({ids:S.mine.slice(-200),at:Date.now()});});}).catch(function(){});},
+    /* can this browser change a proposal? Only the browser that sent it can (and a host). A member who comes back on another device,
+       or after their browser cleared itself, sees the proposal under Yours but cannot change it there. */
+    canChange:function(id){if(!db||S.mode!=='hosted'||S.host)return Promise.resolve(true);return db.doc(P+'authors/'+id).get().then(function(s){return !!data(s);},function(){return false;});},
+    /* hosts: put proposals sent by name alone onto that name's list, for members whose own browser has forgotten them */
+    seedNames:function(groups){if(!db)return Promise.resolve(0);var i=0,n=0;return (function next(){if(i>=groups.length)return n;var g=groups[i++];
+      return nameMineKey(g.name).then(function(k){if(!k)return;var ref=db.doc(P+'mine/'+k);return ref.get().then(function(s){var d=data(s),have=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],add=g.ids.filter(function(x){return have.indexOf(x)<0;});
+        if(!add.length)return;n+=add.length;return ref.set({ids:have.concat(add).slice(-200),at:Date.now()});});}).then(next,next);})();},
     /* hosts: proposals sent under a typed name, before that member had a login, go onto the member's own list, and each author record notes the member */
     carry:function(mem,ids){if(!db||!mem||!mem.s||!mem.m||!ids.length)return Promise.resolve(0);var ref=db.doc(P+'mine/'+mem.s);
       return ref.get().then(function(s){var d=data(s),have=d&&Array.isArray(d.ids)?d.ids.filter(function(x){return typeof x==='string'&&IDRE.test(x);}):[],n=0;
@@ -2012,7 +2026,7 @@ var Win=(function(){
       body.innerHTML='<div class="pintro">'+head+'<button type="button" class="btn lgb ready" data-a="ready">'+C('ready')+'</button></div>';
     }else if((!S.me.name||needPw())&&!S.host){
       var code=load('sit-code',''),again=needPw();
-      body.innerHTML='<form id="namef" class="tags pname" novalidate><div><h3 style="font-family:var(--font-serif);font-weight:600;font-size:26px;line-height:1.1;text-align:center">'+C('nameH')+'</h3><p style="font-size:14.5px;line-height:1.45;color:var(--soft);margin-top:10px;text-align:center">'+C('nameP')+'</p></div>'+
+      body.innerHTML='<form id="namef" class="tags pname" novalidate><div><h3 style="font-family:var(--font-serif);font-weight:600;font-size:26px;line-height:1.1;text-align:center">'+C('nameH')+'</h3><p style="font-size:14.5px;line-height:1.45;color:var(--soft);margin-top:10px;text-align:center">'+C(S.cfg.roster?'nameP2':'nameP')+'</p></div>'+
         '<div><label class="fl" for="n-name">'+C('nameL')+'</label><input id="n-name" class="field" maxlength="80" autocomplete="name" autocapitalize="words" spellcheck="false"'+(again?' value="'+esc(S.me.name)+'"':'')+'></div>'+
         (S.cfg.roster&&S.cfg.pw?'<div><label class="fl" for="n-code">Your password <span class="opt">your own, or the one the hosts gave everyone</span></label><input id="n-code" class="field" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"></div>'
           :S.cfg.roster&&S.cfg.code&&!code?'<div><label class="fl" for="n-code">House code <span class="opt">from your email</span></label><input id="n-code" class="field" autocomplete="off" autocapitalize="none" spellcheck="false"></div>':'')+
@@ -2024,7 +2038,8 @@ var Win=(function(){
       body.innerHTML=head+'<p class="notice" id="f-note"'+(S.cfg.note?'':' hidden')+'>'+esc(S.cfg.note||'')+'</p>'+
         (S.stash?'<p class="notice">The proposal you were writing is kept safe. It comes back when you finish here.</p>':'')+
         (ed?'<p class="notice">You are changing proposal #'+NO[ed.id]+'. <button type="button" class="link" data-a="cancel">Leave it as it was</button></p>':'')+
-        (on?'<p class="notice">'+(f.alt?'A rewording of':'Building on')+' #'+NO[on.id]+': “'+esc(on.text)+'” '+(f.alt?'Whoever wrote it will see yours next to it. ':'')+'<button type="button" class="link" data-a="cancel">Start fresh instead</button></p>':'')+
+        (on&&f.alt&&f.own?'<p class="notice">A new version of your proposal #'+NO[on.id]+'. You sent that one on another device or visit, so it can’t be changed directly. Send the new wording here and the team will see it replaces the old one. <button type="button" class="link" data-a="cancel">Leave it as it was</button></p>':
+         on?'<p class="notice">'+(f.alt?'A rewording of':'Building on')+' #'+NO[on.id]+': “'+esc(on.text)+'” '+(f.alt?'Whoever wrote it will see yours next to it. ':'')+'<button type="button" class="link" data-a="cancel">Start fresh instead</button></p>':'')+
         '<div><span class="fl" id="who-l">'+C('whoL')+' <span class="opt">'+C('whoOpt')+'</span></span><div class="picks" id="f-who" role="group" aria-labelledby="who-l">'+WHO.map(function(w){return w.k==='other'?'<button type="button" class="pick add" data-who="other" aria-pressed="'+(f.who==='other')+'">'+icon('pen')+(f.who==='other'&&f.whoX?esc(f.whoX):C('whoX'))+'</button>':'<button type="button" class="pick" data-who="'+w.k+'" aria-pressed="'+(f.who===w.k)+'">'+E('w.'+w.k)+'</button>';}).join('')+'</div>'+
           '<input id="f-whox" class="field" maxlength="40" autocomplete="off" aria-label="Who must act" placeholder="'+esc(COPY.whoXP)+'" value="'+esc(f.whoX||'')+'"'+(f.who==='other'?'':' hidden')+' style="margin-top:8px"></div>'+
         '<div><label class="fl" for="f-text">'+C('doL')+' <span class="opt">'+C('doOpt')+'</span></label><div class="sent"><p class="sent-lead" id="f-lead" hidden></p><textarea id="f-text" class="field serif" rows="3" maxlength="260">'+esc(f.text)+'</textarea></div>'+
@@ -2186,7 +2201,7 @@ var Win=(function(){
   return {build:build,render:render,place:place,tagging:tagging,tagCount:tagCount,renderTags:renderTags,sheet:sheet,
     edit:function(p){stash();var rest=afterWho(p);S.form={text:rest===null?p.text:rest,who:p.who||'',whoX:p.whoX||'',by:p.by||'',why:p.why||'',risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),editId:p.id,on:null};S.winTab='write';msg=null;save('sit-form',S.form);tuck(false);render();Map_.paint();},
     buildOn:function(p){stash();S.form={text:'',who:'',by:'',why:'',risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),editId:null,on:p.id};S.winTab='write';msg=null;save('sit-form',S.form);tuck(false);render();Map_.paint();},
-    reword:function(p){stash();var rest=afterWho(p);S.form={text:rest===null?p.text:rest,who:p.who||'',whoX:p.whoX||'',by:p.by||'',why:'',risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),editId:null,on:p.id,alt:true};S.winTab='write';msg=null;save('sit-form',S.form);tuck(false);render();Map_.paint();var t=$('#f-text');if(t)t.focus();},
+    reword:function(p,own){stash();var rest=afterWho(p);S.form={text:rest===null?p.text:rest,who:p.who||'',whoX:p.whoX||'',by:p.by||'',why:own?(p.why||''):'',own:!!own,risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),editId:null,on:p.id,alt:true};S.winTab='write';msg=null;save('sit-form',S.form);tuck(false);render();Map_.paint();var t=$('#f-text');if(t)t.focus();},
     signOut:signOut,signIn:function(){S.ready=true;try{sessionStorage.setItem('sit-ready','1');}catch(e){}S.winTab='write';tuck(false);render();place();var n=$('#n-name')||$('#f-text');if(n)n.focus();},
     sync:function(){mineLabel();var fn=$('#f-note');if(fn){fn.textContent=S.cfg.note||'';fn.hidden=!S.cfg.note;}
       var closedNow=!S.cfg.open&&!S.host,shown=!!$('#f-text',body)||!!$('#namef',body);
@@ -2371,11 +2386,13 @@ var Wall=(function(){
   }
   function act(a,b){
     var id=b.dataset.id,p=id&&PBY(id);
-    if(a==='edit'&&p){Boot.tab('map');Win.edit(p);}
+    if(a==='edit'&&p){Store.canChange(p.id).then(function(ok){Boot.tab('map');if(ok)Win.edit(p);else Win.reword(p,true);});}
     else if(a==='reword'&&p){S.wallOpen=null;Boot.tab('map');Win.reword(p);}
     else if(a==='take'&&p){var k=PBY(b.dataset.k);if(k&&isMine(p)){Boot.tab('map');Win.edit(Object.assign({},p,{text:k.text,who:k.who,by:k.by}));}}
     else if(a==='buildon'&&p){Boot.tab('map');Win.buildOn(p);}
-    else if(a==='gone'&&p){if(sure!==id){sure=id;b.textContent='Sure? Yes, take it down';return;}sure=null;S.wallOpen=null;var g=Object.assign({},p,{st:'gone',upd:Date.now()});Store.saveProposal(g,null).then(function(){Boot.toast('Taken down.');}).catch(function(){Boot.toast('That didn’t work. Try again.');});}
+    else if(a==='gone'&&p){if(sure!==id){sure=id;b.textContent='Sure? Yes, take it down';return;}sure=null;S.wallOpen=null;var g=Object.assign({},p,{st:'gone',upd:Date.now()});
+      Store.canChange(p.id).then(function(ok){if(!ok){Boot.toast('You sent this one on another device or visit, so it can’t be taken down here. Ask the team.');Boot.onData();return;}
+        return Store.saveProposal(g,null).then(function(){Boot.toast('Taken down.');});}).catch(function(){Boot.toast('That didn’t work. Try again.');});}
     else if(a==='examples'){S.examples=true;Store.refreshExamples();}
   }
   return {render:render,tile:tile,act:act,reset:function(){var b=$('#wall-body');if(b){var box=$('#wall'),n=box.cloneNode(false);box.parentNode.replaceChild(n,box);}}};
@@ -2445,6 +2462,10 @@ var Hosts=(function(){
   function loose(){var by={},mem={},dup={};Object.keys(S.members).forEach(function(k){if(k==='_all')return;var n=normName(S.members[k].name);if(mem[n])dup[n]=1;mem[n]=S.members[k];});
     S.props.forEach(function(p){var a=S.authors[p.id];if(p.ex||!a||a.mk==='paper'||(a.m&&S.members[a.m]))return;var n=normName(a.name);(by[n]=by[n]||{n:n,name:a.name,ids:[],to:dup[n]?null:mem[n]||null}).ids.push(p.id);});
     return Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});}
+  var seeded=false;
+  function seedOnce(){if(seeded||!S.host||!Object.keys(S.authors).length||!S.props.length)return;seeded=true;
+    setTimeout(function(){var by={};S.props.forEach(function(p){var a=S.authors[p.id];if(p.ex||!a||a.mk!=='unchecked'||(a.m&&S.members[a.m]))return;var n=normName(a.name);(by[n]=by[n]||{name:a.name,ids:[]}).ids.push(p.id);});
+      Store.seedNames(Object.keys(by).map(function(k){return by[k];}));},1500);}
   function looseHTML(){if(!S.cfg.pw)return '';var L=loose();if(!L.length)return '';
     var hit=L.filter(function(x){return x.to;}),miss=L.filter(function(x){return !x.to;}),nh=hit.reduce(function(s,x){return s+x.ids.length;},0),
       ms=Object.keys(S.members).filter(function(k){return k!=='_all';}).map(function(k){return S.members[k];}).sort(function(a,b){return a.name.localeCompare(b.name);});
@@ -2500,7 +2521,7 @@ var Hosts=(function(){
       '<div>'+ps.map(function(p){return '<div class="srcrow"><div class="tx">'+lcsMark(g.text,p.text)+'</div><div class="ra">'+(p.text.trim()!==g.text.trim()?'<button type="button" class="link" data-a="use" data-id="'+esc(p.id)+'">Use this wording</button>':'<b>The wording used</b>')+'<button type="button" class="link" data-a="out" data-id="'+esc(p.id)+'">Take out</button></div><div class="meta"><b>#'+NO[p.id]+'</b> · '+who(p)+'</div></div>';}).join('')+'</div>'+
       (nsel?'<div><button type="button" class="btn sm line" data-a="addsel">Add the '+nsel+' chosen here</button></div>':'')+'</div></div>';
   }
-  function render(){
+  function render(){seedOnce();
     var box=$('#hosts');if(!box||$('#v-hosts').hidden)return;
     if(!S.host){
       if(S.mode!=='hosted'){if(!S.live){box.innerHTML='<h2>for the <b>hosts</b></h2><p class="lead">Loading…</p>';return;}Store.hostSignIn('').then(render);return;}
