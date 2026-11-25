@@ -4164,7 +4164,7 @@ var Hosts=(function(){
       box('plan','Bring in the merge plan','A one-off. It puts the starting proposals on their tables and the reserves in their clusters, tidies the wordings in the plan, brings each family into its lead, puts general proposals behind a specific one as background, and sets aside the ones that are not proposals. The file holds numbers and wordings only, no names. Anything a host or a table has already placed differently is left as it is and listed. Running it again adds nothing twice.','The merge plan file','Bring in the merge plan');}
   /* the name a proposal was sent under, as the hosts know it: its author record, or for the copy the name the database holds for its number */
   function nameOf(p){if(p.ex)return S.host&&p.no&&S.exwho[p.no]||'';var a=S.authors[p.id];return a&&a.name||'';}
-  function who(p){var a=S.authors[p.id];if(p.ex)return nameOf(p)?'<span data-noedit>'+esc(nameOf(p))+'</span> · in the copy':'Name not in this copy';if(!a)return 'Name not loaded';var lm=a.m&&S.members[a.m];return '<span data-noedit>'+esc(a.name)+'</span>'+(lm&&normName(lm.name)!==normName(a.name)?' (login: <span data-noedit>'+esc(lm.name)+'</span>)':'')+(a.mk==='paper'?' · on paper':a.mk==='unchecked'&&a.m&&S.members[a.m]?' · sent before logins, now under their login':a.mk==='unchecked'?' · <b style="color:#C0184F">name not checked</b>':a.m&&a.m.charAt(0)==='u'&&S.cfg.pw?' · <b style="color:#C0184F">signed in with the everyone password</b>':' · signed in');}
+  function who(p){var a=S.authors[p.id];if(p.ex)return nameOf(p)?'<span data-noedit>'+esc(nameOf(p))+'</span> · in the copy':'Name not in this copy';if(!a)return 'Name not loaded';var lm=a.m&&S.members[a.m];return '<span data-noedit>'+esc(a.name)+'</span>'+(lm&&normName(lm.name)!==normName(a.name)?' (login: <span data-noedit>'+esc(lm.name)+'</span>)':'')+(a.mk==='paper'?' · on paper':a.mk==='unchecked'&&a.m&&S.members[a.m]?' · sent before logins, now under their login':a.mk==='unchecked'?'':a.m&&a.m.charAt(0)==='u'&&S.cfg.pw?' · <b style="color:#C0184F">signed in with the everyone password</b>':' · signed in');}
   /* the proposal as the House would vote on it: who must act and by when sit inside the one sentence */
   function voteText(p){var t=(p.text||'').trim();if(!t)return '';t=joinWho(p.who,t,p.whoX).replace(/[.!?]+$/,'');t=t.charAt(0).toUpperCase()+t.slice(1);if(p.by&&WHENBY[p.by])t+=', '+lcFirst(WHENBY[p.by].l);return t+'.';}
   function hp(p,o){
@@ -4238,6 +4238,7 @@ var Hosts=(function(){
   function gname(g){return 'group '+g.id.slice(1);}
   function sect(title,c,dk,list,extra,at){return '<div class="sect"><div class="secth'+(dk?' dk':'')+'" style="--c:'+c+'"'+(at||'')+'>'+title+'<span class="n">'+list.length+'</span></div>'+(extra||'')+(list.length?list.map(function(p){return hp(p);}).join(''):'<p class="empty-note">Nothing here yet.</p>')+'</div>';}
   function pile(){
+    if(S.mode==='hosted'&&S.hostBy==='like')S.hostBy='new';
     var list=liveProps(),by=S.hostBy,html='';
     if(by==='like'){
       var sg=suggest();
@@ -4246,6 +4247,8 @@ var Hosts=(function(){
           s.ids.map(function(id,i){return hp(PBY(id),{mark:i?base:null});}).join('')+'</div>';}).join('')
         :'<p class="empty-note">No look-alikes left to check. Sort the pile another way to group proposals by hand.</p>';
       html='<p class="how">The page compares the wording of every proposal not yet in a group. Words a proposal doesn’t share with the first one are highlighted. It only matches words, so read each pair: two proposals can mean the same thing in different words, and those you group by hand.</p>'+html;
+    }else if(by==='new'){   /* the latest first: for placing proposals sent after the merge plan */
+      html='<p class="how">The newest proposals first. Give a table to any that a table should take on.</p>'+sect('Newest first','#FFFFFF',false,list.slice().sort(function(a,b){return (NO[b.id]||0)-(NO[a.id]||0);}));
     }else if(by==='num'){   /* for finding one proposal by its number: liveProps() is already in the order the numbers were given */
       html='<p class="how">Every proposal in number order. A number that is missing has been taken down or set aside.</p>'+sect('In number order','#FFFFFF',false,list);
     }else if(by==='theme'){   /* the team's loose themes, in the order each first appears by number; every proposal sits under one heading */
@@ -4473,8 +4476,8 @@ var Hosts=(function(){
     list.forEach(function(p){var nm=nameOf(p);members[nm?normName(nm):p.id]=1;});
     var choices=d.groups.filter(function(g){return g.kind==='choice';}).length,nsel=Object.keys(S.sel).length;
     /* themes come with the example set only: the way to sort by them shows when a live proposal has one */
-    var themed=list.some(function(p){return !!p.theme;});if(S.hostBy==='theme'&&!themed)S.hostBy='like';
-    var bys=[['like','Look-alikes'],['num','Number']].concat(themed?[['theme','Theme']]:[]).concat([['group','Cluster'],['risk','Risk'],['driver','Driver'],['loose','Not grouped yet'],['aside','Set aside']]);var nAside=asideProps().length;
+    var themed=list.some(function(p){return !!p.theme;});if(S.hostBy==='theme'&&!themed)S.hostBy='like';if(S.mode==='hosted'&&S.hostBy==='like')S.hostBy='new';   /* on the website: no look-alikes (the merge plan did the combining) */
+    var bys=(S.mode==='hosted'?[['new','Newest first']]:[['like','Look-alikes']]).concat([['num','Number']]).concat(themed?[['theme','Theme']]:[]).concat([['group','Cluster'],['risk','Risk'],['driver','Driver'],['loose','Not grouped yet'],['aside','Set aside']]);var nAside=asideProps().length;
     box.innerHTML='<h2>for the <b>hosts</b></h2><p class="lead">Bring proposals together without changing what members meant. Join the ones that say the same thing, keep small differences as options, and mark the ones that need a choice. Then publish an update to the proposals page.</p>'+
       (S.mode!=='hosted'?'<p class="notice warn" style="margin-top:14px;max-width:760px">Preview: on the live page this tab sits behind the host passcode.</p>':'')+lockBanner()+
       '<div class="stats"><div class="stat"><b>'+list.length+'</b><span>proposals</span></div><div class="stat"><b>'+Object.keys(members).length+'</b><span>members have sent one</span></div>'+
