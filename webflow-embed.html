@@ -9,10 +9,10 @@
 <script>
 (function(){
   var f=document.getElementById('hotp-sit'), base=f.getAttribute('data-src');
-  // Links: #wall opens the wall so far, #hosts the hosts' tab, no hash the risk map and the proposal window.
+  // Links: #wall opens The wall, #hosts the hosts' tab, #who the list of people, #experts the experts' page; no hash opens the risk map and the proposal window.
   // #k=CODE carries the House code from the link in the members' email, so they only have to type their name.
   function pass(){
-    var h=/^#(wall|hosts|k=[\w-]{3,40})$/.test(location.hash)?location.hash:'';
+    var h=/^#(wall|hosts|who|experts|k=[\w-]{3,40})$/.test(location.hash)?location.hash:'';
     if(f.getAttribute('src')!==base+h) f.setAttribute('src',base+h);
   }
   pass(); window.addEventListener('hashchange',pass);
