@@ -1611,6 +1611,35 @@ body.tagging .wip{display:none!important}
 .hp .why{grid-column:2;grid-row:3;color:#4B586A;font-size:13px}
 .hp:hover,.hp:focus-within{box-shadow:0 0 0 3px var(--yellow);position:relative;z-index:2}
 .hp .ingrp{border-radius:999px;padding:1px 9px}
+.hp .hp-x{grid-column:2;display:flex;flex-wrap:wrap;gap:2px 16px;align-items:center;margin-top:4px;font-size:13.5px}
+.hp .hp-x .link{color:#14243C;font-size:13.5px}
+.hp .hp-x .link[aria-expanded="true"]{font-weight:700}
+.hp .hp-x .hp-just{font-weight:700;color:#8A1240}
+.hp.hl{outline:4px solid var(--pink,#F06CA8);outline-offset:-2px;animation:hpfl 2.6s ease-out}
+@keyframes hpfl{0%,55%{background:#FFF6C2}100%{background:#FFFFFF}}
+@media (prefers-reduced-motion:reduce){.hp.hl{animation:none}}
+.hp:focus{outline:none}.hp.hl:focus{outline:4px solid var(--pink,#F06CA8)}
+.fin-bd{display:inline-flex;align-items:center;gap:4px;padding:2px 9px 2px 7px;border-radius:999px;background:#14243C;color:#FFFFFF;font-size:12px;font-weight:700;line-height:1.3;white-space:nowrap;vertical-align:middle;margin-left:6px}
+.fin-bd svg,.pv-fin svg,.wp-fin svg,.pv-fin-l svg,.fin-ic svg,.yr-fin svg,.fin-warn svg,.wp-fin0 svg,.rm-bd.fin svg,#v-wall .dotkey svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pv-b .pv-fin{display:none;position:absolute;right:-12px;top:-14px;width:38px;height:38px;border-radius:50%;background:#14243C;color:#FFFFFF;box-shadow:0 0 0 3px #FFFFFF;z-index:2;place-items:center}
+.pv-b .pv-fin svg{width:22px;height:22px;stroke-width:2.6}
+.pv-key .kbw{display:inline-grid;place-items:center;background:#FFFFFF;padding:3px;border-radius:3px}
+.pv-b.fin .pv-fin{display:grid}
+.pv-fin-l{display:flex;align-items:center;gap:8px;font-weight:700;color:#14243C}
+.pv-key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;line-height:1.3;margin:0 0 12px;opacity:.92}
+.pv-key>span{display:inline-flex;align-items:center;gap:7px}
+.pv-key .fin-ic{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#14243C;color:#FFFFFF;box-shadow:0 0 0 1.5px #FFFFFF}
+.rm-bd.fin{display:inline-flex;align-items:center;gap:4px;background:#14243C;color:#FFFFFF}
+.wp-fin{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 12px;margin:0 0 12px;background:#14243C;color:#FFFFFF;border-radius:8px}
+.wp-fin p{display:flex;align-items:center;gap:8px;margin:0}.wp-fin .btn{background:#FFFFFF;color:#14243C}
+.wp-fin0 .btn{display:inline-flex;align-items:center;gap:6px}
+.fin-warn{display:flex;align-items:center;gap:8px}
+.yr-fin{display:flex;align-items:center;gap:6px;font-weight:700}
+.hp .hp-x .hp-finb{font-weight:700}
+.hp-sp{max-width:720px}.hp-sp .rowf label{font-weight:700;font-size:14px;color:#14243C}.hp-sp select.field{width:auto;max-width:260px;padding:6px 8px;font-size:14.5px}
+.hp-as .opt{color:#4B586A}.hp-sp .hs-msg{margin:0;padding:9px 12px;background:#F0E060;color:#0A0A0A;font-size:14px;font-weight:700}
+.hp-sp .hs-lead{margin:0 0 -4px;font-family:var(--font-serif);font-size:16px;color:#14243C}.hp-sp textarea.field{min-height:60px}
+.hnote .field{max-width:640px}
 .bench{display:block;margin-top:22px}
 .bench .tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px}
 .bench .gpb[aria-expanded="true"]{background:var(--white);color:var(--night)}
@@ -1645,6 +1674,12 @@ body.tagging .wip{display:none!important}
 .hgp .grp .flag{background:var(--yellow);color:var(--black)}
 .hgp .link{color:var(--night)}
 .hgp .pubbar{background:var(--dark-green);color:#FFFFFF;border-radius:10px;margin-top:14px}
+/* the button that calls the panel back: on the right edge, half way down, whatever the pile is doing */
+.hgfab{position:fixed;z-index:29;right:0;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;padding:14px 7px;border:0;border-radius:10px 0 0 10px;background:#FFFFFF;color:#14243C;font:700 13.5px/1.1 var(--font-sans,system-ui),sans-serif;letter-spacing:.01em;cursor:pointer;box-shadow:0 0 0 1px rgba(20,36,60,.18),0 8px 22px rgba(4,12,24,.35)}
+.hgfab:hover{background:#FFF6C2}.hgfab[aria-expanded="true"]{background:#14243C;color:#FFFFFF}
+.hgfab:focus-visible{outline:3px solid var(--yellow,#F0E060);outline-offset:2px}
+@media (max-width:899px){.hgfab{padding:12px 5px;font-size:12.5px}}
+@media (min-width:900px){.hgfab[aria-expanded="true"]{display:none}}   /* the open panel covers that edge: its own button closes it */
 .hgp .pubbar .btn.white{background:#FFFFFF;color:var(--night)}
 .hgp .btn{box-shadow:none}
 .hgp .fl{color:var(--night)}
@@ -2369,7 +2404,7 @@ var COPY={
   closed:'Proposals are closed for now. You can still read the proposals so far.',
   tagbar:'Tap every risk your proposal addresses, the most important one first.',
   wallH:'the <b>proposals</b> so far', wallLead:'Every brick is one proposal, in the words of the member who wrote it. Open a brick to read the reasoning and the risks it speaks to.',
-  dots0:'An empty dot: a first draft from a member', dots1:'A filled dot: brought together with others like it'
+  dots0:'An empty dot: a first draft from a member', dots1:'A filled dot: brought together with others like it', dots2:'A lock: final wording agreed by its table'
 };
 
 Object.assign(COPY,{
@@ -2546,7 +2581,12 @@ function saneTable(d){ /* fixed shape, as for proposals */
      opt   the id of the lead it is an equal option beside                      opts  on that lead, its options in order (Option 2, 3, …)
    by is who did it, in plain words: "The hosts", "Table E2", "The cluster host, People at work". Changes of wording are not here:
    they are in hist. The lines are written in one place only, Store.tableSet, by comparing the record before and after (logDiff). */
-var LOGK={cl:1,tab:1,star:1,broad:1,top:1,flag:1,res:1,into:1,from:1,split:1,aside:1,back:1,was:1,now:1,wx:1,cl2:1,cl2x:1,down:1,bg:1,bgs:1,opt:1,opts:1};
+var LOGK={cl:1,tab:1,star:1,broad:1,top:1,flag:1,res:1,into:1,from:1,split:1,aside:1,back:1,was:1,now:1,wx:1,cl2:1,cl2x:1,down:1,bg:1,bgs:1,opt:1,opts:1,note:1,halves:1,halfof:1,fin:1,finx:1};
+/* 27 Nov: note   a host's one-line note about a change (the member reads it)
+   halves on a proposal the hosts split in two, the id of the other half     halfof on that other half, the id it was split from
+   A split writes its note as a note line at the same moment, and the first half's wording before goes on its hist. */
+function hostNoteOf(t,l){var r='';((t&&t.log)||[]).some(function(m){if(m.k==='note'&&m.at===l.at&&m.by===l.by){r=String(m.v||'');return true;}return false;});return r;}
+function logFull(id){return (((TW(id)||{}).log)||[]).length>=60;}
 function saneLog(x){if(!x||typeof x.k!=='string'||!LOGK[x.k])return null;var v=x.v;
   if(Array.isArray(v))v=v.filter(function(y){return typeof y==='string'&&IDRE.test(y);}).slice(0,20);
   else if(v!==true&&v!==false)v=String(v==null?'':v).slice(0,200);
@@ -2708,6 +2748,13 @@ function workBy(){return S.staff&&!S.host?(S.staff.role==='chost'?(S.staff.cl?'C
    only the proposals in their own room. Proposals that are in no cluster yet, and moves between rooms, are for the hosts alone.
    Nobody but hosts once the wording is locked. */
 function isCrew(){return !!(S.host||S.staff);}
+/* 27 Nov: a proposal a host can split in two: a live one of this page's own, not set aside and not brought into another */
+function canHalve(p){return !!S.host&&!!p&&!p.ex&&!p.example&&p.st!=='gone'&&!isAside(p)&&!((TW(p.id)||{}).into);}
+/* a member's page: a proposal the hosts split from one of the member's own is theirs too, so it shows under "Yours" at once */
+function adoptHalves(){if(S.host||!S.mine||!S.mine.length||!S.table)return;var ch=false;
+  Object.keys(S.table).forEach(function(id){if(S.mine.indexOf(id)>=0)return;var t=S.table[id];if(!t||!t.log)return;
+    for(var i=0;i<t.log.length;i++){var l=t.log[i];if(l.k==='halfof'&&S.mine.indexOf(l.v)>=0){S.mine.push(id);ch=true;break;}}});
+  if(ch){keepMine();if(S.me.name&&S.me.m)Store.mineSave();}}
 /* A facilitator takes a proposal on for their OWN table, and hands back only what their own table holds. Moving a proposal between
    the tables of a room, or giving one to another table, is for the room's cluster host and the hosts. */
 function isFac(){return !!S.staff&&!S.host&&S.staff.role==='fac';}
@@ -2718,6 +2765,18 @@ function mayHandBack(p){if(S.host)return true;if(!S.staff)return false;return S.
 function crewIn(k){return !!S.host||(!!S.staff&&CLOF[staffCl()]===k);}
 function canWork(p){if(!p||p.example||p.st==='gone'||isAside(p))return false;if(S.host)return true;if(!S.staff||locked())return false;
   var mine=staffCl(),room=roomOf(p);return !!mine&&room!=='none'&&(CLLET[room]===mine||CLLET[alsoOf(p)]===mine);}   /* offered in two clusters: either room */
+/* 27 Nov: the final wording of one proposal, agreed (log lines fin / finx; the latest of the two counts). {by, at} or null. */
+function finOf(p){var t=p&&TW(p.id),l=null;((t&&t.log)||[]).forEach(function(x){if(x.k==='fin'||x.k==='finx')l=x;});return l&&l.k==='fin'?{by:l.by,at:l.at}:null;}
+/* who agreed it, in plain words, never a name */
+function finBy(by){by=String(by||'');if(/^Table [A-F][1-4]$/.test(by))return 'table '+by.slice(6);if(by==='The hosts')return 'the hosts';return /cluster host/i.test(by)?'the cluster host':'a facilitator';}
+/* may whoever is signed in mark it, or undo the mark? Its own table's facilitator, its cluster's cluster host, hosts; once the wording is locked, hosts only */
+function canFin(p){if(!p||p.example||p.ex||p.st==='gone'||isAside(p)||((TW(p.id)||{}).into))return false;var tab=tabOf(p),room=roomOf(p);if(!tab&&room==='none')return false;
+  if(S.host)return true;if(!S.staff||locked())return false;
+  if(S.staff.role==='chost')return !!S.staff.cl&&(CLLET[room]===S.staff.cl||CLLET[alsoOf(p)]===S.staff.cl||(!!tab&&tab.charAt(0)===S.staff.cl));
+  return S.staff.role==='fac'&&!!tab&&S.staff.ct===tab;}
+/* a story keeps its last 60 lines, but never loses the line that says whether its final wording is agreed */
+function keepFin(all){if(all.length<=60)return all;var last=null;all.forEach(function(l){if(l.k==='fin'||l.k==='finx')last=l;});var cut=all.slice(-60);if(last&&cut.indexOf(last)<0)cut=[last].concat(all.slice(-59));return cut;}
+function finBadge(){return '<span class="fin-bd">'+icon('lock')+'Final wording</span>';}
 /* A proposal in no cluster yet: any facilitator may take it on for their own table, and any cluster host may give it to a table in their own
    cluster. Doing so brings it into that table's cluster. That is all they may do with it until it has a cluster: the wording, questions and
    top picks wait until a table has it. Hosts already may do everything (canWork). */
@@ -3045,7 +3104,7 @@ var Store=(function(){
     /* Every change leaves its line in the record's log, here and nowhere else: the record before is compared with the record after.
        opt.by: who did it, when it is not whoever is signed in. opt.add: lines that are not a change to a field (was, now, down, bg). */
     tableSet:function(id,ch,opt){if(!db)return Promise.reject(new Error('offline'));opt=opt||{};
-      var ex=isEx(id),now=Date.now(),cur=S.table[id]||{id:id,tab:'',hist:[],at:now},o=Object.assign({},cur,ch,{id:id,upd:now});
+      var ex=isEx(id),now=+opt.now||Date.now(),cur=S.table[id]||{id:id,tab:'',hist:[],at:now},o=Object.assign({},cur,ch,{id:id,upd:now});
       /* written at a table (p.wt): once a table has had it and lets it go, it waits with the rest of the room, not with the table that
          wrote it. Only an undo, which names wx itself, puts it back as it was. */
       var wp=PBY(id),wt=wp&&tabOk(wp.wt)?wp.wt:'';
@@ -3064,14 +3123,34 @@ var Store=(function(){
         if(c2a!==c2b){if(c2a)lines.push({at:now,k:'cl2x',v:c2a,by:by});if(c2b)lines.push({at:now,k:'cl2',v:c2b,by:by});}}
       if(wt&&o.wx&&!cur.wx&&!cur.tab&&!o.tab){   /* the table that wrote it has left it for the rest of the room: it stays in that room, so there is no "put it in" line */
         lines=lines.filter(function(l){return !(l.k==='cl'&&l.v===wt.charAt(0));});lines.push({at:now,k:'wx',v:wt,by:by});}
-      if(lines.length)o.log=(cur.log||[]).concat(lines).slice(-60);
+      if(lines.length)o.log=keepFin((cur.log||[]).concat(lines));
       o=saneTable(o);if(!o)return Promise.reject(new Error('bad table record'));
+      if(opt.dry)return o;   /* the record as it would be, for a batch that writes it with others (halve) */
       (ex?T1:T0)[id]=o;merge(true);return tref(id).set(o);},
     /* a new wording: the proposal always carries the current sentence, and the one before goes onto the table record's history */
     saveWording:function(p,ch,why,by){var self=this,prev=p.text,cur=TW(p.id),hist=((cur&&cur.hist)||[]).concat([{t:prev,why:String(why||'').slice(0,200),by:by,at:Date.now()}]).slice(-30);
       var put;if(p.ex){var o={id:p.id,text:ch.text,who:ch.who!==undefined?ch.who:(p.who||''),whoX:ch.whoX!==undefined?ch.whoX:(p.whoX||''),by:ch.by!==undefined?ch.by:(p.by||'')};p.text=ch.text;put=exdb.doc(P+'proposals/'+p.id).set(o);}
       else put=self.saveProposal(Object.assign({},p,ch,{upd:Date.now()}),null);
       return put.then(function(){return self.tableSet(p.id,{hist:hist});});},
+    /* hosts: one proposal split in two. p keeps its number and takes ch (its first half); np is the second half, a new proposal with its
+       author record au; place is where np goes ({cl} or {cl,tab}); note is the host's one line, which both members' stories show.
+       One batch where the store has batches. Without: the new half first, then the first half, so a stop part-way loses nothing. */
+    halve:function(p,ch,np,au,place,note){var self=this;
+      if(!db)return Promise.reject(new Error('offline'));if(!canHalve(p)||isEx(p.id)||!np||isEx(np.id)||!au||normName(au.name).length<2)return Promise.reject(new Error('not allowed'));
+      var now=Date.now(),cur=TW(p.id),hist=((cur&&cur.hist)||[]).concat([{t:p.text,why:String(note||'').slice(0,200),by:'The hosts',at:now}]).slice(-30);
+      var o1=self.tableSet(p.id,{hist:hist},{by:'The hosts',now:now,dry:true,add:[{k:'halves',v:np.id},{k:'note',v:note}].concat(finOf(p)?[{k:'finx',v:'split'}]:[])}),
+          o2=self.tableSet(np.id,place||{},{by:'The hosts',now:now,dry:true,add:[{k:'halfof',v:p.id},{k:'note',v:note}]}),
+          p1=sane(Object.assign({},p,ch,{upd:now})),p2=sane(np);
+      if(!o1||!o2||typeof o1.then==='function'||typeof o2.then==='function'||!p1||!p2||!(p2.at>0))return Promise.reject(new Error('bad split'));
+      var pd1=db.doc(P+'proposals/'+p.id),pd2=db.doc(P+'proposals/'+np.id),ad=db.doc(P+'authors/'+np.id);
+      function done(){T0[p.id]=o1;T0[np.id]=o2;var i1=-1,i2=-1;S.props.forEach(function(x,i){if(x.id===p.id)i1=i;if(x.id===np.id)i2=i;});
+        if(i1>=0)S.props[i1]=p1;if(i2<0)S.props.push(p2);S.authors[np.id]=au;renumber();merge(true);return np.id;}
+      if(db.batch){var b=db.batch();b.set(ad,au);b.set(pd2,p2);b.set(tref(np.id),o2);b.set(pd1,p1);b.set(tref(p.id),o1);return b.commit().then(done);}
+      return ad.set(au).then(function(){return pd2.set(p2);}).then(function(){return tref(np.id).set(o2);}).then(function(){return pd1.set(p1);}).then(function(){return tref(p.id).set(o1);}).then(done);},
+    /* hosts: add proposals to one member's own list (kept under their login's secret); the list only grows */
+    mineAdd:function(k,ids){if(!db||!k||k.length<20)return Promise.resolve(0);var ref=db.doc(P+'mine/'+k);
+      return ref.get().then(function(x){var d=data(x),have=d&&Array.isArray(d.ids)?d.ids.filter(function(y){return typeof y==='string'&&IDRE.test(y);}):[],add=ids.filter(function(y){return have.indexOf(y)<0;});
+        if(!add.length)return 0;return ref.set({ids:have.concat(add).slice(-200),at:Date.now()}).then(function(){return add.length;});});},
     /* name: the member who suggests it. The suggestion itself carries their first name; the full name is saved beside it, in a record of its own. */
     addSug:function(s,name){s=saneSug(s);if(!db||!s)return Promise.reject(new Error('bad suggestion'));
       var full=String(name||'').replace(/\s+/g,' ').trim().slice(0,80),d=isEx(s.pid)?exdb:db,sd=d.doc(P+'sug/'+s.id);s.by=(full.split(' ')[0]||'').slice(0,40);
@@ -3656,6 +3735,7 @@ var Win=(function(){
       body.innerHTML=head+'<p class="notice" id="f-note"'+(S.cfg.note?'':' hidden')+'>'+esc(S.cfg.note||'')+'</p>'+
         (S.stash?'<p class="notice">The proposal you were writing is kept safe. It comes back when you finish here.</p>':'')+
         (ed?'<p class="notice">You are changing proposal #'+NO[ed.id]+'. <button type="button" class="link" data-a="cancel">Leave it as it was</button></p>':'')+
+        (ed&&S.host&&finOf(ed)?'<p class="notice warn fin-warn">'+icon('lock')+W('This wording was marked final by {N}. Change it only if you must, and say why.',[finBy(finOf(ed).by)])+'</p>':'')+
         (on&&f.was?'<p class="notice">You are writing proposal #'+NO[on.id]+' again. The hosts set it aside'+((TW(on.id)||{}).aside?': <span data-noedit>“'+esc(TW(on.id).aside.why)+'”</span>':'.')+' Make it one clear, specific action, then send it. <button type="button" class="link" data-a="cancel">Leave it</button></p>':
          on&&f.alt&&f.own?'<p class="notice">A new version of your proposal #'+NO[on.id]+'. You sent that one on another device or visit, so it can’t be changed directly. Send the new wording here and the team will see it replaces the old one. <button type="button" class="link" data-a="cancel">Leave it as it was</button></p>':
          on?'<p class="notice">'+(f.alt?'A rewording of':'Building on')+' #'+NO[on.id]+': “'+esc(on.text)+'” '+(f.alt?'Whoever wrote it will see yours next to it. ':'')+'<button type="button" class="link" data-a="cancel">Start fresh instead</button></p>':'')+
@@ -3668,10 +3748,11 @@ var Win=(function(){
         '<div class="cnt"><span id="f-whyp"></span><span id="f-whyc"></span></div></div>'+
         '<div class="tags"><span class="fl" style="margin:0">'+C('tagsL')+'</span>'+(autoFrom()?'<p class="tfirst">'+C('tagsFirst')+'</p>':'')+'<div class="pm-a"><button type="button" class="btn sm line" data-a="pick">'+C('tagsBtn')+'</button><button type="button" class="btn sm line" data-a="list">'+C('pickList')+'</button></div><p class="tagn" id="f-tags"></p></div>'+
         '<div class="readback"><span class="fl" style="margin:0">'+C('rbL')+'</span><p class="rb" id="f-rb" aria-live="polite"></p><p class="rb-how">'+C('rbHow')+'</p></div>'+
+        (ed&&S.host&&(!isMine(ed)||finOf(ed))?'<div class="hnote"><label class="fl" for="f-hnote">Why it changed, in one line <span class="opt">the member sees this · needed when the wording changes</span></label><input id="f-hnote" class="field" maxlength="200" autocomplete="off" value="'+esc(f.hnote||'')+'"></div>':'')+
         '<p class="notice" id="f-msg" hidden></p>'+
-        (S.host||S.staff?'<div class="onbehalf"><label class="fl" for="f-paper">Are you uploading this on behalf of a member?</label><input id="f-paper" class="field" maxlength="80" placeholder="Their full name" value="'+esc(S.paper)+'" autocomplete="off" autocapitalize="words" spellcheck="false">'+
+        (!(ed&&S.host&&!isMine(ed))&&(S.host||S.staff)?'<div class="onbehalf"><label class="fl" for="f-paper">Are you uploading this on behalf of a member?</label><input id="f-paper" class="field" maxlength="80" placeholder="Their full name" value="'+esc(S.paper)+'" autocomplete="off" autocapitalize="words" spellcheck="false">'+
           (S.host?'':'<p class="ob-how">Leave this empty if the proposal is your own. It is then sent under your name'+(S.staff.name?', '+esc(S.staff.name):'')+'.</p>')+'</div>':'')+
-        (S.host?'<p class="me" style="font-size:13.5px;color:var(--soft)">You are a host: this is saved as a paper proposal.'+(S.mode!=='hosted'?' <button type="button" class="link" data-a="unhost">Be a member again</button>':'')+'</p>':'')+
+        (S.host&&!(ed&&!isMine(ed))?'<p class="me" style="font-size:13.5px;color:var(--soft)">You are a host: this is saved as a paper proposal.'+(S.mode!=='hosted'?' <button type="button" class="link" data-a="unhost">Be a member again</button>':'')+'</p>':'')+
         '<div class="pfoot"><button type="button" class="btn lgb" data-a="send">'+(ed?C('saveEdit'):C('send2'))+'</button></div>';
       renderTags();showLead();showNudges();whyCount();if(msg)setMsg(msg.k,msg.h);
     }
@@ -3695,6 +3776,7 @@ var Win=(function(){
       if(e.target.id==='f-text'){S.form.text=e.target.value;showNudges();showRb();save('sit-form',S.form);if(msg)setMsg(null);}
     else if(e.target.id==='f-why'){S.form.why=e.target.value;whyCount();save('sit-form',S.form);}
     else if(e.target.id==='f-paper'){S.paper=e.target.value;}
+    else if(e.target.id==='f-hnote'){S.form.hnote=e.target.value;save('sit-form',S.form);}
   }
   function onClick(e){
     var b=e.target.closest('button');if(!b)return;
@@ -3751,6 +3833,11 @@ var Win=(function(){
         (S.tries>1?' <button type="button" class="link" data-a="anyway" style="color:inherit">Carry on anyway: the team will check it by hand</button>':''));}
     });}).catch(function(){say(W('We couldn’t check just now.')+' <button type="button" class="link" data-a="anyway" style="color:inherit">'+W('Carry on: the team will check it by hand')+'</button>');});
   }
+  /* a host's change to someone else's proposal: the proposal first, then its history (the wording before, and why), as a table's change is saved */
+  function hostSave(old,p,why){var re=p.text!==old.text;
+    return Store.saveProposal(p,null).then(function(){var t=TW(old.id)||{};
+      if(re)return Store.tableSet(old.id,{hist:(t.hist||[]).concat([{t:old.text,why:why,by:'The hosts',at:Date.now()}]).slice(-30)},{by:'The hosts'});
+      if(why&&!logFull(old.id))return Store.tableSet(old.id,{},{by:'The hosts',add:[{k:'note',v:why}]});});}
   function resetForm(){S.form=S.stash||{text:'',who:'',whoX:'',by:'',why:'',risks:[],drivers:[],editId:null,on:null};S.stash=null;S.skipTags=false;save('sit-form',S.form);}
   function stash(){if(!S.stash&&!S.form.editId&&!S.form.on&&(S.form.text.trim()||S.form.why.trim()))S.stash=S.form;}
 
@@ -3792,6 +3879,8 @@ var Win=(function(){
     if(!crew&&!S.me.name)return;
     if(!f.risks.length&&!S.skipTags){setMsg('warn',W('You haven’t linked this to a risk yet.')+' <button type="button" class="link" data-a="pick" style="color:inherit">'+W('Choose them on the map')+'</button> '+W('or')+' <button type="button" class="link" data-a="sendplain" style="color:inherit">'+W('send it as it is')+'</button>.');return;}
     var old=f.editId&&PBY(f.editId),now=Date.now();
+    /* a host changing someone else's proposal: the wording before goes on its history, with one line saying why (the member reads it) */
+    var hostEd=!!old&&!!S.host&&(!isMine(old)||!!finOf(old)),hnote=hostEd?String(f.hnote||'').replace(/\s+/g,' ').trim().slice(0,200):'';
     var p={id:old?old.id:rid(12),text:joinWho(f.who,text,f.whoX).slice(0,300),why:tidyWhy(f.why).slice(0,700),risks:f.risks.filter(function(r){return RISKS[r];}),drivers:(function(){var o=[];f.risks.forEach(function(r){(DOF[r]||[]).forEach(function(d){if(o.indexOf(d)<0)o.push(d);});});return o;})(),
       at:old?old.at:now,upd:now,st:'live',src:old?old.src||'web':(behalf?'paper':'web')};
     if(f.on&&PBY(f.on)){p.on=f.on;if(f.alt)p.alt=true;}else if(old&&old.on){p.on=old.on;if(old.alt)p.alt=true;}
@@ -3808,12 +3897,15 @@ var Win=(function(){
     function atTable(tb){if(old||!wtabOn()||!tabOk(tb))return;if(p.risks.some(function(r){return CLLET[RISKS[r].g]===tb.charAt(0);}))p.wt=tb;}
     var facT=S.staff&&!S.host&&S.staff.role==='fac'?S.staff.ct:'';
     if(!behalf)atTable(crew?(own?facT:''):S.me.ct);
+    if(hostEd&&p.text!==old.text&&hnote.length<3){setMsg('warn',W('Say in one line why the wording changed. The member will see it.'));var hne=$('#f-hnote');if(hne)hne.focus();return;}
+    if(old&&!S.host&&finOf(old)){setMsg('warn',W('The final wording of this proposal is agreed, so it can’t be changed here. Ask your facilitator.'));return;}
     var btn=$('[data-a="send"]',el);if(btn){btn.disabled=true;btn.textContent=W('Sending…');}
     S.sending=true;setMsg(null);
     var slow=setTimeout(function(){if(S.sending)setMsg('warn',W('Still sending. Keep this page open until it says your proposal is in.'));},9000);
     /* a name that is on the list of people is stored as the list has it, however it was typed */
     (author&&behalf?Store.person(paper).then(function(per){if(per&&per.name)author.name=per.name;atTable(per&&per.ct?per.ct:facT);},function(){atTable(facT);}):Promise.resolve()).then(function(){
       /* if the store will not take the new field (its rules are older than this page), the proposal is sent without it, as before: nothing a member writes is lost */
+      if(hostEd)return hostSave(old,p,hnote);
       return Store.saveProposal(p,author).catch(function(e){if(!p.wt||old)throw e;delete p.wt;return Store.saveProposal(p,author);});}).then(function(){
       S.sending=false;clearTimeout(slow);if(behalf)S.paper='';
       if(!isMine(p)&&!behalf&&!S.host){S.mine.push(p.id);keepMine();if(asMember)Store.mineSave();}
@@ -3906,7 +3998,9 @@ var Wall=(function(){
   function chipsHTML(p){return (p.risks||[]).map(function(r){return riskChip(r);}).join('')+(p.drivers||[]).map(function(d){return drvChip(d);}).join('');}
   function acts(p){var mine=isMine(p);if(p.ex)return '';
     return '<div class="wt-acts">'+(S.cfg.open&&!mine&&!S.host?'<button type="button" class="btn sm glass" data-a="reword" data-id="'+esc(p.id)+'">'+C('aReword')+'</button>':'')+(S.cfg.open||S.host?'<button type="button" class="btn sm glass" data-a="buildon" data-id="'+esc(p.id)+'">'+C('aBuild')+'</button>':'')+
-      (mine||S.host?'<button type="button" class="btn sm glass" data-a="edit" data-id="'+esc(p.id)+'">'+C('aEdit')+'</button><button type="button" class="btn sm glass" data-a="gone" data-id="'+esc(p.id)+'">'+(sure===p.id?'Sure? Yes, take it down':C('aGone'))+'</button>':'')+'</div>';}
+      (mine||S.host?'<button type="button" class="btn sm glass" data-a="edit" data-id="'+esc(p.id)+'">'+C('aEdit')+'</button><button type="button" class="btn sm glass" data-a="gone" data-id="'+esc(p.id)+'">'+(sure===p.id?'Sure? Yes, take it down':C('aGone'))+'</button>':'')+
+      (S.host?'<button type="button" class="btn sm glass" data-a="h-open" data-id="'+esc(p.id)+'">Open in the hosts’ tab</button>'+(canHalve(p)?'<button type="button" class="btn sm glass" data-a="h-split" data-id="'+esc(p.id)+'">Split in two</button>':'')+
+        '<button type="button" class="btn sm glass" data-a="h-note" data-id="'+esc(p.id)+'">Add a note</button>':'')+'</div>';}
   /* what others have made of a proposal. On "Yours" the member can take a suggested wording as their own. */
   function kidsHTML(p,own){var ks=kidsOf(p).filter(function(k){return !own||!isMine(k);});if(!ks.length)return own?'<p class="wt-cap">'+C('kidsNone')+'</p>':'';
     return '<div class="wt-kids"><p class="wt-cap">'+C('kidsH')+'</p>'+ks.map(function(k){var fresh=own&&S.seen.indexOf(k.id)<0;
@@ -3916,7 +4010,7 @@ var Wall=(function(){
   /* a proposal as a card, for the "Yours" list in the proposal window */
   function tile(p,o){
     o=o||{};var sk=skinOf(p,0);
-    return '<div class="wt-card" style="--wt-bg:'+sk.base+';--wt-acc:'+sk.acc+'"><p class="wt-cap"><span class="wt-dot'+(p.stage?'':' hollow')+'"></span>'+tagline(p)+'<span class="when">'+rel(p.upd||p.at)+'</span></p>'+
+    return '<div class="wt-card" style="--wt-bg:'+sk.base+';--wt-acc:'+sk.acc+'"><p class="wt-cap"><span class="wt-dot'+(p.stage?'':' hollow')+'"></span>'+tagline(p)+(finOf(p)?' '+finBadge():'')+'<span class="when">'+rel(p.upd||p.at)+'</span></p>'+
       '<p class="wt-card-t">'+esc(p.text)+'</p>'+(p.why?'<p class="wt-said">'+esc(p.why)+'</p>':'')+
       ((p.risks||[]).length+(p.drivers||[]).length?'<div class="wt-chips">'+chipsHTML(p)+'</div>':'<p class="wt-cap">'+C('noLink')+'</p>')+(o.sec==='mine'?kidsHTML(p,true):'')+acts(p)+'</div>';
   }
@@ -3953,7 +4047,7 @@ var Wall=(function(){
         '<div class="wt-sec-b"><span class="wt-lab">the proposals as members wrote them</span>'+g.src.map(function(x){return '<p class="wt-body src"><b>#'+x.no+'</b> '+esc(x.text)+'</p>';}).join('')+'</div>'+
         '<div class="wt-sec-b"><span class="wt-lab">the risks and drivers it speaks to</span><div class="wt-chips">'+chipsHTML(g)+'</div></div>';
     }else{var p=it.p;
-      inner='<div class="wt-p-head"><span class="wt-dot big'+(p.stage?'':' hollow')+'" aria-hidden="true"></span><p class="wt-cap wt-cap-lg">'+tagline(p)+'</p></div>'+
+      inner='<div class="wt-p-head"><span class="wt-dot big'+(p.stage?'':' hollow')+'" aria-hidden="true"></span><p class="wt-cap wt-cap-lg">'+tagline(p)+(finOf(p)?' '+finBadge():'')+'</p></div>'+
         '<div class="wt-sec-b"><span class="wt-lab">the proposal, as the member wrote it</span><p class="wt-body big">'+esc(p.text)+'</p></div>'+
         (hasRb(p)?'<div class="wt-sec-b"><span class="wt-lab">'+C('rbWall')+'</span><p class="wt-body rb">'+readback(p)+'</p></div>':'')+
         (p.why?'<div class="wt-sec-b"><span class="wt-lab">'+C('whyH')+'</span><p class="wt-body wt-said">'+esc(p.why)+'</p></div>':'')+
@@ -4022,7 +4116,7 @@ var Wall=(function(){
     var box=$('#wall');if(!box||$('#v-wall').hidden)return;
     var by=[['group',C('by1')],['risk',C('by2')],['driver',C('by3')],['new',C('by4')]],hidden=!S.cfg.wall&&!S.host;
     if(!$('#wall-body')){
-      box.innerHTML='<header class="wt-head"><h2>'+C('wallH')+'</h2><p class="lead">'+C('wallLead')+'</p><div class="tools" id="wall-tools"></div><div class="dotkey"><span><span class="wt-dot hollow"></span>'+C('dots0')+'</span><span><span class="wt-dot"></span>'+C('dots1')+'</span></div><div id="wall-note"></div></header>'+
+      box.innerHTML='<header class="wt-head"><h2>'+C('wallH')+'</h2><p class="lead">'+C('wallLead')+'</p><div class="tools" id="wall-tools"></div><div class="dotkey"><span><span class="wt-dot hollow"></span>'+C('dots0')+'</span><span><span class="wt-dot"></span>'+C('dots1')+'</span><span>'+icon('lock')+C('dots2')+'</span></div><div id="wall-note"></div></header>'+
         '<div class="wt-layout"><nav class="wt-side" id="wt-nav" aria-label="Jump to a part of the wall"></nav><div class="wt-main" id="wall-body"></div><div class="wt-pad" aria-hidden="true"></div></div>';
       box.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var a=b.dataset.a;
         if(b.dataset.by){S.wallBy=b.dataset.by;S.wallOpen=null;render();}else if(b.dataset.view){S.wallView=b.dataset.view;S.wallOpen=null;render();}else if(a==='clear'){S.wallRisk=null;render();}
@@ -4066,13 +4160,15 @@ var Wall=(function(){
   }
   function act(a,b){
     var id=b.dataset.id,p=id&&PBY(id);
-    if(a==='edit'&&p){Store.canChange(p.id).then(function(ok){Boot.tab('map');if(ok)Win.edit(p);else Win.reword(p,true);});}
+    if(a==='edit'&&p&&!S.host&&finOf(p))Boot.toast(W('The final wording of this proposal is agreed, so it can’t be changed here. Ask your facilitator.'));
+    else if(a==='edit'&&p){Store.canChange(p.id).then(function(ok){Boot.tab('map');if(ok)Win.edit(p);else Win.reword(p,true);});}
     else if(a==='reword'&&p){S.wallOpen=null;Boot.tab('map');Win.reword(p);}
     else if(a==='take'&&p){var k=PBY(b.dataset.k);if(k&&isMine(p)){Boot.tab('map');Win.edit(Object.assign({},p,{text:k.text,who:k.who,by:k.by}));}}
     else if(a==='buildon'&&p){Boot.tab('map');Win.buildOn(p);}
     else if(a==='gone'&&p){if(sure!==id){sure=id;b.textContent=W('Sure? Yes, take it down');return;}sure=null;S.wallOpen=null;var g=Object.assign({},p,{st:'gone',upd:Date.now()});
       Store.canChange(p.id).then(function(ok){if(!ok){Boot.toast('You sent this one on another device or visit, so it can’t be taken down here. Ask the team.');Boot.onData();return;}
         return Store.saveProposal(g,null).then(function(){Boot.toast('Taken down.');});}).catch(function(){Boot.toast('That didn’t work. Try again.');});}
+    else if((a==='h-open'||a==='h-split'||a==='h-note')&&p&&S.host){S.wallOpen=null;Boot.tab('hosts',{row:p.id,act:a==='h-open'?'':a.slice(2)});}
     else if(a==='examples'){S.examples=true;Store.refreshExamples();}
   }
   return {render:render,tile:tile,act:act,reset:function(){var b=$('#wall-body');if(b){var box=$('#wall'),n=box.cloneNode(false);box.parentNode.replaceChild(n,box);}}};
@@ -4100,7 +4196,9 @@ var BANDS={same:{n:'Reads the same',c:'#C0E8F8',kind:'merge'},close:{n:'A small 
 function bandOf(ids){var min=1;for(var i=0;i<ids.length;i++)for(var j=i+1;j<ids.length;j++)min=Math.min(min,likeness(PBY(ids[i]),PBY(ids[j])));return min>=.78?'same':min>=.5?'close':'related';}
 
 var Hosts=(function(){
-  var saveT=0,SU={},CNT=null;   /* CNT: how many proposals each table holds, worked out once for each drawing of the tab */
+  var saveT=0,SU={},CNT=null;
+  S.hgOpen=load('sit-hgopen',false)===true;   /* the Brought together panel, open or closed, as this browser last had it */
+  function setHg(v){S.hgOpen=!!v;save('sit-hgopen',S.hgOpen);}   /* CNT: how many proposals each table holds, worked out once for each drawing of the tab */
   function draft(){if(!S.draft)S.draft={groups:[],dismissed:[],n:0};return S.draft;}
   function touch(){S.draftDirty=true;clearTimeout(saveT);if(!S.examples)saveT=setTimeout(Store.saveDraft,900);}
   function grouped(){var m={};draft().groups.forEach(function(g){g.ids.forEach(function(id){m[id]=g;});});return m;}
@@ -4179,12 +4277,85 @@ var Hosts=(function(){
   function voteText(p){var t=(p.text||'').trim();if(!t)return '';t=joinWho(p.who,t,p.whoX).replace(/[.!?]+$/,'');t=t.charAt(0).toUpperCase()+t.slice(1);if(p.by&&WHENBY[p.by])t+=', '+lcFirst(WHENBY[p.by].l);return t+'.';}
   function hp(p,o){
     o=o||{};var g=grouped()[p.id],vt=voteText(p);
-    return '<div class="hp'+(g?' in':'')+'" data-id="'+esc(p.id)+'"><input type="checkbox" data-sel="'+esc(p.id)+'"'+(S.sel[p.id]?' checked':'')+(g?' disabled':'')+' aria-label="Choose proposal '+NO[p.id]+'">'+
-      '<div class="meta"><b>#'+NO[p.id]+'</b><span>'+who(p)+'</span><span>'+sentOn(p.at)+'</span>'+(p.on&&NO[p.on]?'<span>builds on #'+NO[p.on]+'</span>':'')+(g?'<span class="ingrp">In '+gname(g)+'</span>':'')+
+    return '<div class="hp'+(g?' in':'')+(hlOn(p.id)?' hl':'')+'" data-id="'+esc(p.id)+'" tabindex="-1"><input type="checkbox" data-sel="'+esc(p.id)+'"'+(S.sel[p.id]?' checked':'')+(g?' disabled':'')+' aria-label="Choose proposal '+NO[p.id]+'">'+
+      '<div class="meta"><b>#'+NO[p.id]+'</b>'+(finOf(p)?finBadge():'')+'<span>'+who(p)+'</span><span>'+sentOn(p.at)+'</span>'+(p.on&&NO[p.on]?'<span>builds on #'+NO[p.on]+'</span>':'')+(g?'<span class="ingrp">In '+gname(g)+'</span>':'')+
       '<button type="button" class="link haside" data-a="aside" data-id="'+esc(p.id)+'" aria-expanded="'+(S.asideAt===p.id)+'">Set aside</button>'+(p.ex?'':'<button type="button" class="link hdown" data-a="hdown" data-id="'+esc(p.id)+'" aria-expanded="'+(S.sureDown===p.id)+'">Take down</button>')+'</div>'+
-      '<div class="tx">'+(o.mark?lcsMark(o.mark,vt):esc(vt))+'</div>'+clRow(p)+(S.asideAt===p.id?asideForm(p):'')+(S.sureDown===p.id&&!p.ex?downForm(p):'')+
+      '<div class="tx">'+(o.mark?lcsMark(o.mark,vt):esc(vt))+'</div>'+clRow(p)+(S.asideAt===p.id?asideForm(p):'')+(S.sureDown===p.id&&!p.ex?downForm(p):'')+hpActs(p)+
       '</div>';
   }
+  /* 27 Nov: what else a host can do to one row: reword it (the writing form, which then asks why), or add a one-line note the member reads */
+  function hpActs(p){if(!S.host||p.ex)return '';var o=S.hAct&&S.hAct.id===p.id?S.hAct.k:'',just=S.hJust&&S.hJust.id===p.id&&Date.now()<S.hJust.until;
+    return '<div class="hp-x" role="group" aria-label="More for proposal '+NO[p.id]+'">'+
+      '<button type="button" class="link" data-a="h-reword" data-id="'+esc(p.id)+'">Reword</button>'+
+      (canFin(p)?(finOf(p)?'<button type="button" class="link hp-finb" data-a="h-finx" data-id="'+esc(p.id)+'" aria-pressed="true">'+(S.finSure===p.id?'Sure? Yes, undo the mark':'Final wording agreed · Undo')+'</button>':
+        '<button type="button" class="link" data-a="h-fin" data-id="'+esc(p.id)+'" aria-pressed="false">Mark final wording agreed</button>'):'')+
+      '<button type="button" class="link'+(just?' hp-just':'')+'" data-a="h-note" data-id="'+esc(p.id)+'" aria-expanded="'+(o==='note')+'">'+(just?'Changed. Add a note about it?':'Add a note')+'</button>'+
+      (canHalve(p)?'<button type="button" class="link" data-a="h-split" data-id="'+esc(p.id)+'" aria-expanded="'+(o==='split')+'">Split in two</button>':'')+
+      '<button type="button" class="link" data-a="h-wall" data-id="'+esc(p.id)+'">See it on the wall</button>'+
+      '</div>'+(o==='note'?noteForm(p):o==='split'&&canHalve(p)?splitForm(p):'');}
+  function hlOn(id){return !!S.hHL&&S.hHL.id===id&&Date.now()<S.hHL.until;}
+  function rowEl(id){var bx=box0();return bx?bx.querySelector('.bench .hp[data-id="'+String(id||'').replace(/[^A-Za-z0-9]/g,'')+'"]'):null;}
+  /* the tab has just been opened: on one proposal's row (from The wall), or back where the host was */
+  function land(opt,n){var bx=box0();if(!S.host||!bx||S.tab!=='hosts')return;var id=opt&&opt.row,p=id&&PBY(id);
+    if(!bx.querySelector('.bench')){if(p&&(n||0)<20)setTimeout(function(){land(opt,(n||0)+1);},300);return;}   /* still loading */
+    if(!p){var y=+S.hostsY||0;if(y)window.scrollTo(0,y);var lr=S.hostsLast&&rowEl(S.hostsLast);if(lr)try{lr.focus({preventScroll:true});}catch(e){}return;}
+    if(opt.act==='split'&&canHalve(p))openSplit(p);else if(opt.act==='note'){S.hAct={id:p.id,k:'note'};delete SU['hn-text'];}
+    if(S.hgOpen&&window.innerWidth<900)setHg(false);   /* on a narrow screen the panel would cover the row */
+    S.hHL={id:p.id,until:Date.now()+2600};S.hostsLast=p.id;render();
+    if(!rowEl(p.id)){S.hostBy=isAside(p)?'aside':'num';render();}   /* the pile's sort hides it: every proposal is under Number */
+    var r=rowEl(p.id);if(!r)return;try{r.scrollIntoView({block:'center'});}catch(e){r.scrollIntoView();}
+    var f=opt.act==='split'?$('#hs-a'):opt.act==='note'?$('#hn-text'):null;try{(f||r).focus({preventScroll:true});}catch(e){}
+    setTimeout(function(){var r2=rowEl(p.id);if(r2)r2.classList.remove('hl');},2700);}
+  var HS=['hs-a','hs-b','hs-who','hs-wx','hs-by','hs-cl','hs-tb','hs-note','hs-msg','hs-id','hs-at'];
+  function clearSplit(){HS.forEach(function(k){delete SU[k];});}
+  function openSplit(p){clearSplit();var lead=afterWho(p);S.hAct={id:p.id,k:'split'};SU['hs-a']=lead!==null?lead:p.text;}
+  function sameW(a,b){function n(x){return String(x||'').trim().replace(/\s+/g,' ').replace(/[.!?]+$/,'').toLowerCase();}return n(a)===n(b);}
+  function splitForm(p){var lead=afterWho(p),cnt=CNT||tabCounts(),cl=SU['hs-cl']||'',tb=SU['hs-tb']||'',w2=SU['hs-who']!=null?SU['hs-who']:(p.who||''),b2=SU['hs-by']!=null?SU['hs-by']:(p.by||''),
+      wx=SU['hs-wx']!=null?SU['hs-wx']:(p.whoX||'');
+    function o(v,l,sel){return '<option value="'+esc(v)+'"'+(v===sel?' selected':'')+'>'+esc(l)+'</option>';}
+    return '<div class="hp-as hp-sp" role="group" aria-label="Split proposal '+NO[p.id]+' in two">'+
+      (finOf(p)?'<p class="hs-msg fin-warn">'+icon('lock')+W('This wording was marked final by {N}. Splitting it reopens the wording.',[finBy(finOf(p).by)])+'</p>':'')+'<p class="hp-asn"><b>Split it in two.</b> #'+NO[p.id]+' keeps its number and the first half. The second half becomes a new proposal with the next number, under the same member’s name, with the same risks and reasoning.</p>'+
+      '<label class="fl" for="hs-a">The first half</label>'+(lead!==null?'<p class="hs-lead" data-noedit>'+esc(whoLead(p.who,p.whoX))+' …</p>':'')+
+      '<textarea id="hs-a" class="field serif" rows="2" maxlength="260">'+esc(SU['hs-a']||'')+'</textarea>'+
+      '<label class="fl" for="hs-b">The second half <span class="opt">a new proposal</span></label>'+
+      '<div class="rowf"><label for="hs-who">Who must act</label><select id="hs-who" class="field">'+o('','Not said',w2)+WHO.map(function(x){return o(x.k,x.l,w2);}).join('')+'</select>'+
+        (w2==='other'?'<input id="hs-wx" class="field" maxlength="40" autocomplete="off" aria-label="Who must act" placeholder="Who" value="'+esc(wx)+'">':'')+
+        '<label for="hs-by">By when</label><select id="hs-by" class="field">'+o('','Not said',b2)+WHEN.map(function(x){return o(x.k,x.l,b2);}).join('')+'</select></div>'+
+      (w2&&WHOBY[w2]&&(w2!=='other'||whoName('other',wx))?'<p class="hs-lead" data-noedit>'+esc(whoLead(w2,wx))+' …</p>':'')+
+      '<textarea id="hs-b" class="field serif" rows="2" maxlength="260">'+esc(SU['hs-b']||'')+'</textarea>'+
+      '<div class="rowf"><label for="hs-cl">Its cluster</label>'+clSel(cl,'id="hs-cl" class="field"','Choose a cluster')+
+        '<label for="hs-tb">Table</label><select id="hs-tb" class="field"'+(cl?'':' disabled')+'><option value="">No table yet</option>'+(cl?[1,2,3,4].map(function(n){var x=cl+n;return '<option value="'+x+'"'+(tb===x?' selected':'')+'>'+tabLabel(x,cnt)+'</option>';}).join(''):'')+'</select></div>'+
+      '<label class="fl" for="hs-note">Why it was split, in one line <span class="opt">the member sees this</span></label><input id="hs-note" class="field" maxlength="200" autocomplete="off" value="'+esc(SU['hs-note']||'')+'">'+
+      (SU['hs-msg']?'<p class="hs-msg" role="alert">'+esc(SU['hs-msg'])+'</p>':'')+
+      '<div class="rowf"><button type="button" class="btn sm" data-a="hs-go" data-id="'+esc(p.id)+'"'+(S.hBusy?' disabled':'')+'>Split it in two</button><button type="button" class="link" data-a="hs-x">Cancel</button></div></div>';}
+  /* what the form asks for, checked; the new proposal's id and time are kept, so trying again after a failed save writes the same records */
+  function halfPlan(p){var lead=afterWho(p),a=String(SU['hs-a']||'').trim().replace(/\s+/g,' '),bb=String(SU['hs-b']||'').trim().replace(/\s+/g,' '),
+      w2=SU['hs-who']!=null?SU['hs-who']:(p.who||''),wx=w2==='other'?(SU['hs-wx']!=null?SU['hs-wx']:(p.whoX||'')):'',b2=SU['hs-by']!=null?SU['hs-by']:(p.by||''),
+      cl=SU['hs-cl']||'',tb=SU['hs-tb']||'',note=String(SU['hs-note']||'').replace(/\s+/g,' ').trim().slice(0,200),au=S.authors[p.id];
+    if(words(a)<2)return {err:W('Write the first half’s wording first.'),f:'hs-a'};
+    var t1=(lead!==null?joinWho(p.who,a,p.whoX):joinWho('',a)).slice(0,300);
+    if(sameW(t1,p.text))return {err:W('Change the first half’s wording: take the second half out of it.'),f:'hs-a'};
+    if(words(bb)<2)return {err:W('Write the second half’s wording.'),f:'hs-b'};
+    if(w2==='other'&&!whoName('other',wx))return {err:W('Type who must act for the second half.'),f:'hs-wx'};
+    var t2=joinWho(w2&&WHOBY[w2]?w2:'',bb,wx).slice(0,300);
+    if(sameW(t1,t2))return {err:W('The two halves say the same thing.'),f:'hs-b'};
+    if(!clOk(cl))return {err:W('Choose the second half’s cluster.'),f:'hs-cl'};
+    if(tb&&(!tabOk(tb)||tb.charAt(0)!==cl))tb='';
+    if(tb&&tabFull(tb,null))return {err:W('Table {T} already has {1}, the most a table can take. Hand one back first.',[tb,tabN(tb)]),f:'hs-tb'};
+    if(note.length<3)return {err:W('Say in one line why it was split. The member will see it.'),f:'hs-note'};
+    if(!au||normName(au.name).length<2)return {err:W('The sender’s name has not loaded yet, so it cannot be split now. Try again in a moment.')};
+    var now=+SU['hs-at']||Date.now(),id=SU['hs-id']||rid(12);SU['hs-at']=now;SU['hs-id']=id;
+    var np={id:id,text:t2,why:p.why||'',risks:(p.risks||[]).slice(),drivers:(p.drivers||[]).slice(),at:now,upd:now,st:'live',src:p.src==='paper'?'paper':'web'};
+    if(w2&&WHOBY[w2]&&(w2!=='other'||whoName('other',wx))){np.who=w2;if(w2==='other')np.whoX=whoName('other',wx);}if(b2&&WHENBY[b2])np.by=b2;
+    var ar={id:id,uid:(window.SITTING_BACKEND&&window.SITTING_BACKEND.uid)||S.me.uid||'',name:au.name,mk:au.mk||'unchecked',at:now};if(au.m)ar.m=au.m;
+    return {t1:t1,np:np,au:ar,place:tb?{tab:tb,cl:cl}:{cl:cl},note:note};}
+  function noteForm(p){
+    return '<div class="hp-as" role="group" aria-label="A note on proposal '+NO[p.id]+'"><label class="fl" for="hn-text">A note about this change, in one line <span class="opt">the member sees it</span></label>'+
+      (logFull(p.id)?'<p class="hp-asn" role="status">'+W('This proposal’s story is full, so no more notes can be added to it.')+'</p><div class="rowf"><button type="button" class="link" data-a="hn-x">Close</button></div>':
+      '<input id="hn-text" class="field" maxlength="200" autocomplete="off" placeholder="For example: moved to E2, which covers this risk" value="'+esc(SU['hn-text']||'')+'">'+
+      '<div class="rowf"><button type="button" class="btn sm" data-a="hn-go" data-id="'+esc(p.id)+'">Save the note</button><button type="button" class="link" data-a="hn-x">Cancel</button></div>'+
+      '<p class="hp-asn">It shows in the proposal’s story and under “Yours” for the member who sent it.</p>')+'</div>';}
+  function justed(p){S.hJust={id:p.id,until:Date.now()+30000};}
   /* Setting a proposal aside: it is not one clear, specific action. The hosts give one line, which its author will read.
      Nothing is deleted and the number stays: it only leaves the rooms, The wall and the lists, until a host puts it back. */
   var ASIDE_WHY=['It is a belief, not an action','It is more than one action','It is not clear who must act, or what they must do'];
@@ -4202,7 +4373,7 @@ var Hosts=(function(){
       '<div class="rowf"><button type="button" class="btn sm" data-a="hdown-go" data-id="'+esc(p.id)+'">Take it down</button><button type="button" class="link" data-a="hdown-x">Cancel</button></div>'+
       '<p class="hp-asn">It keeps its number and leaves The wall. Only its author and the hosts can still read it.</p></div>';}
   function asideRow(p){var t=TW(p.id)||{},a=t.aside||{};
-    return '<div class="hp as" data-id="'+esc(p.id)+'"><span></span><div class="meta"><b>#'+NO[p.id]+'</b><span>'+who(p)+'</span><span>set aside '+esc(sentOn(a.at||p.at))+'</span>'+
+    return '<div class="hp as'+(hlOn(p.id)?' hl':'')+'" data-id="'+esc(p.id)+'" tabindex="-1"><span></span><div class="meta"><b>#'+NO[p.id]+'</b><span>'+who(p)+'</span><span>set aside '+esc(sentOn(a.at||p.at))+'</span>'+
       '<button type="button" class="link hstory" data-a="story" data-id="'+esc(p.id)+'">Read its story</button><button type="button" class="btn sm hback" data-a="aside-back" data-id="'+esc(p.id)+'">Put it back</button></div>'+
       '<div class="tx">'+esc(voteText(p))+'</div><p class="hp-asw"><b>Why:</b> '+(a.why?'<span data-noedit>'+esc(a.why)+'</span>':'No reason given.')+'</p></div>';}
   /* which cluster this proposal is in, for a host to choose. A proposal placed by the automatic rule cannot go back to "Not yet". */
@@ -4219,7 +4390,7 @@ var Hosts=(function(){
         (L?four(L):CLKEYS.map(function(x){return '<optgroup label="'+CLLET[x]+' · '+esc(GROUP[x].n)+'">'+four(CLLET[x])+'</optgroup>';}).join(''))+'</select></label></div>'+
       (ask?'<p class="hp-ov" role="alert">Table '+ask+' already has '+tabN(ask,cnt)+'. Give it this one anyway? <button type="button" class="btn sm" data-a="over-yes">Yes, give it</button><button type="button" class="link" data-a="over-no">No</button></p>':'');}
   /* give one proposal to a table (which also puts it in the table's cluster), or take it back from its table (tab '') */
-  function giveTab(p,tb){return Store.tableSet(p.id,tb?{tab:tb,cl:tb.charAt(0)}:{tab:''}).then(function(){S.overAsk=null;Boot.toast(tb?W('#{1} is with table {T} now.',[NO[p.id],tb]):W('#{1} is not with a table now.',[NO[p.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});}
+  function giveTab(p,tb){return Store.tableSet(p.id,tb?{tab:tb,cl:tb.charAt(0)}:{tab:''}).then(function(){S.overAsk=null;justed(p);Boot.toast(tb?W('#{1} is with table {T} now.',[NO[p.id],tb]):W('#{1} is not with a table now.',[NO[p.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});}
   /* ---------- tables and their proposals: how full each table is, what no table has yet, and how long the vote would take ---------- */
   function voteTime(n){var m=Math.round(n*1.1/5)*5,hh=Math.floor(m/60),mm=m%60;if(m<5)return 'a few minutes';return 'about '+[hh?pl(hh,'hour','hours'):'',mm?mm+' minutes':''].filter(Boolean).join(' ');}
   function tablesHTML(){var open=!!(S.openD||{}).tabs,cnt=CNT||tabCounts(),wc=wCounts(),live=liveProps().filter(function(p){return !intoOf(p);}),withT=live.filter(function(p){return !!tabOf(p);}).length,wait=live.length-withT,nope=live.filter(function(p){return roomOf(p)==='none';}).length;
@@ -4480,7 +4651,7 @@ var Hosts=(function(){
       return;
     }
     if(!S.draftReady){box.innerHTML='<h2>for the <b>hosts</b></h2><p class="lead">Loading the groups…</p>';return;}
-    var act=document.activeElement,keep=act&&box.contains(act)&&act.id?{id:act.id,s:act.selectionStart}:null,sy=window.scrollY,pg=box.querySelector('.hgb'),pgy=pg?pg.scrollTop:0;
+    var act=document.activeElement,keep=act&&box.contains(act)&&act.id?{id:act.id,s:act.selectionStart}:null,krow=act&&box.contains(act)&&!act.id&&act.classList&&act.classList.contains('hp')?act.dataset.id:'',sy=window.scrollY,pg=box.querySelector('.hgb'),pgy=pg?pg.scrollTop:0;
     CNT=tabCounts();
     var list=liveProps(),d=draft(),members={},gaps=RORDER.filter(function(id){return !list.some(function(p){return (p.risks||[]).indexOf(id)>=0;});}),inG=grouped();
     list.forEach(function(p){var nm=nameOf(p);members[nm?normName(nm):p.id]=1;});
@@ -4503,9 +4674,10 @@ var Hosts=(function(){
           '<label for="sel-cl2">Also offer in</label><select id="sel-cl2" class="field"'+(SU['sel-cl']?'':' disabled')+'><option value="">—</option>'+CLKEYS.map(function(x){var Lx=CLLET[x];return Lx===SU['sel-cl']?'':'<option value="'+Lx+'"'+(SU['sel-cl2']===Lx?' selected':'')+'>'+Lx+' · '+esc(GROUP[x].n)+'</option>';}).join('')+'</select>'+
           '<button type="button" class="btn sm" data-a="putsel">'+(SU['sel-sure']?'Yes, put them there':'Put')+'</button></span>'+
         '<button type="button" class="link" data-a="clearsel">Clear</button>'+(SU['sel-msg']?'<span class="selmsg" role="status">'+esc(SU['sel-msg'])+'</span>':'')+'</div>':SU['sel-msg']?'<div class="selbar done"><span class="selmsg" role="status">'+esc(SU['sel-msg'])+'</span><button type="button" class="link" data-a="selok">OK</button></div>':'')+'</div></div>'+
-      (S.hgOpen&&d.groups.length?'<aside class="hgp" role="dialog" aria-label="Brought together"><div class="hgh"><h3>Brought together</h3><button type="button" class="hgx" data-a="gpx" aria-label="Close">'+icon('x')+'</button></div><div class="hgb"><p class="how">Each group becomes one brick on the proposals page, with every member’s original wording kept underneath it.</p>'+
-      (d.groups.length?d.groups.map(groupCard).join(''):'<p class="empty-note">No groups yet. Start with the look-alikes, or tick proposals in the pile and bring them together.</p>')+
-      '<div class="pubbar"><p><b>'+(S.integ?'Update '+S.integ.v+' was published '+clock(S.integ.at)+'.':'Nothing published yet.')+'</b> Publishing shows members the groups above, beside the proposals as they wrote them. '+(list.length-Object.keys(inG).length)+' proposals stand on their own.</p><button type="button" class="btn white" data-a="publish">Publish update '+((S.integ&&S.integ.v||0)+1)+' to the proposals</button></div></div></aside>':'')+
+      '<button type="button" class="hgfab" data-a="gp" aria-expanded="'+!!S.hgOpen+'" aria-label="Brought together: '+d.groups.length+(d.groups.length===1?' group':' groups')+'">Brought together · '+d.groups.length+'</button>'+
+      (S.hgOpen?'<aside class="hgp" role="dialog" aria-label="Brought together"><div class="hgh"><h3>Brought together</h3><button type="button" class="hgx" data-a="gpx" aria-label="Close">'+icon('x')+'</button></div><div class="hgb"><p class="how">Each group becomes one brick on the proposals page, with every member’s original wording kept underneath it.</p>'+
+      (d.groups.length?d.groups.map(groupCard).join(''):S.mode==='hosted'?'<p class="empty-note">No groups yet. To bring proposals together, tick them in the pile, then press “Bring these together” in the bar at the foot.</p>':'<p class="empty-note">No groups yet. Start with the look-alikes, or tick proposals in the pile and bring them together.</p>')+
+      (d.groups.length||S.integ?'<div class="pubbar"><p><b>'+(S.integ?'Update '+S.integ.v+' was published '+clock(S.integ.at)+'.':'Nothing published yet.')+'</b> Publishing shows members the groups above, beside the proposals as they wrote them. '+(list.length-Object.keys(inG).length)+' proposals stand on their own.</p><button type="button" class="btn white" data-a="publish">Publish update '+((S.integ&&S.integ.v||0)+1)+' to the proposals</button></div>':'')+'</div></aside>':'')+
       '<details class="setup"'+(S.setupOpen?' open':'')+' id="setup"><summary>Set-up: opening and closing, members’ names, paper proposals, keeping a copy</summary><div class="in">'+
       '<div class="rowf"><span class="tl" style="font-weight:700">Proposals are</span><div class="seg"><button type="button" data-cfg="open" data-v="1" aria-pressed="'+!!S.cfg.open+'">Open</button><button type="button" data-cfg="open" data-v="0" aria-pressed="'+!S.cfg.open+'">Closed</button></div>'+
       '<span class="tl" style="font-weight:700">Members can see</span><div class="seg"><button type="button" data-cfg="wall" data-v="1" aria-pressed="'+!!S.cfg.wall+'">The whole wall</button><button type="button" data-cfg="wall" data-v="0" aria-pressed="'+!S.cfg.wall+'">Only their own</button></div></div>'+autoRow()+
@@ -4536,8 +4708,10 @@ var Hosts=(function(){
       (S.mode!=='hosted'?'<p class="how" style="margin:10px 0 0">'+esc(exNote())+'</p>':'')+'</div></details>';
     QA.wire(box,'host');
     if(!box.dataset.wired){box.dataset.wired='1';box.addEventListener('click',onClick);box.addEventListener('change',onChange);box.addEventListener('input',onInput);
+      box.addEventListener('focusin',function(e){var r=e.target&&e.target.closest&&e.target.closest('.hp[data-id]');if(r)S.hostsLast=r.dataset.id;});
       box.addEventListener('toggle',function(e){var id=e.target.id;if(id==='setup')S.setupOpen=e.target.open;else if(/^(people|tabs|two|broad|qs|fe)$/.test(id)){S.openD=S.openD||{};if(!!S.openD[id]!==e.target.open){S.openD[id]=e.target.open;render();}}},true);}
     if(keep){var el=document.getElementById(keep.id);if(el){el.focus();try{el.setSelectionRange(keep.s,keep.s);}catch(e){}}}
+    if(krow){var kr=rowEl(krow);if(kr)try{kr.focus({preventScroll:true});}catch(e){}}
     window.scrollTo(0,sy);var pg2=box.querySelector('.hgb');if(pg2)pg2.scrollTop=pgy;
     HV.mount();HV.clear();HV.setMode(S.hostBy==='driver'?'drivers':'clusters');HV.sync();
     if(!wired2){wired2=true;wireHV(box);}
@@ -4554,19 +4728,22 @@ var Hosts=(function(){
     box.addEventListener('mouseover',at);box.addEventListener('focusin',at);
     box.addEventListener('mouseleave',function(){cur=null;HV.clear();});
     box.addEventListener('focusout',function(e){if(!box.contains(e.relatedTarget)){cur=null;HV.clear();}});
-    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.hgOpen&&S.tab==='hosts'){S.hgOpen=false;render();}});
+    document.addEventListener('keydown',function(e){if(e.key!=='Escape'||!S.hgOpen||S.tab!=='hosts')return;var ae=document.activeElement;   /* only from inside the panel */
+      if(!ae||!ae.closest||!ae.closest('.hgp'))return;setHg(false);render();var fb=box0()&&box0().querySelector('.hgfab');if(fb)try{fb.focus({preventScroll:true});}catch(x){}});
   }
   function box0(){return $('#hosts');}
   function G(el){var c=el.closest('[data-g]');if(!c)return null;var id=c.dataset.g;return draft().groups.filter(function(g){return g.id===id;})[0];}
   var qT=0;
   function onInput(e){var tid=e.target.id||'';
+    if(/^hs-/.test(tid)&&SU['hs-msg']){delete SU['hs-msg'];var hm=box0()&&box0().querySelector('.hs-msg');if(hm)hm.remove();}   /* typing again clears the split form's last message */
     if(tid==='pp-list'){SU[tid]=e.target.value;SU['pp-msg']='';var ck=$('#pp-check'),tx=checkText(e.target.value);if(ck){ck.hidden=!tx;ck.textContent=tx;ck.className='notice'+(/problem/.test(tx)?' warn':'');}return;}
     if(tid==='pp-moves'){SU[tid]=e.target.value;SU['pp-mmsg']='';return;}
     if(tid==='pp-q'){SU[tid]=e.target.value;clearTimeout(qT);qT=setTimeout(render,180);return;}
     if(tid==='aside-why'){SU[tid]=e.target.value;[].forEach.call(e.target.parentNode.querySelectorAll('[data-a="aside-r"]'),function(x){x.setAttribute('aria-pressed',String(x.textContent===e.target.value));});return;}
-    if(e.target.id&&/^(ro-names|ro-code|cfg-note|wipe-w|down-why|down-by|imp-hist|imp-plan)$/.test(e.target.id)){SU[e.target.id]=e.target.value;return;}var f=e.target.dataset.f,g=f&&G(e.target);if(!g||f==='home')return;g[f]=e.target.value;touch();}
+    if(e.target.id&&/^(ro-names|ro-code|cfg-note|wipe-w|down-why|down-by|imp-hist|imp-plan|hn-text|hs-a|hs-b|hs-wx|hs-note)$/.test(e.target.id)){SU[e.target.id]=e.target.value;return;}var f=e.target.dataset.f,g=f&&G(e.target);if(!g||f==='home')return;g[f]=e.target.value;touch();}
   function onChange(e){
     var t=e.target;
+    if(/^hs-(who|by|cl|tb)$/.test(t.id||'')){SU[t.id]=t.value;if(t.id==='hs-cl')delete SU['hs-tb'];delete SU['hs-msg'];render();return;}
     if(/^pp-f[cth]$/.test(t.id||'')){SU[t.id]=t.value;render();return;}
     if(t.dataset.pct||t.dataset.pcl){var pe=S.people[t.dataset.pct||t.dataset.pcl];if(!pe)return;var pd=JSON.parse(JSON.stringify(pe));pd.at=Date.now();
       if(t.dataset.pcl){if(!t.value)return;pd.cl=t.value;}
@@ -4593,9 +4770,9 @@ var Hosts=(function(){
       if(tv&&tabFull(tv,tp)){S.overAsk={id:tp.id,t:tv};render();return;}   /* over the limit: a host may, after one question */
       t.disabled=true;giveTab(tp,tv);return;}
     if(t.dataset.cl2){var ap2=PBY(t.dataset.cl2),av=t.value;if(!ap2||(av&&!clOk(av)))return;t.disabled=true;
-      offer2(ap2,av).then(function(ok){Boot.toast(ok===false?W('Give it a first cluster before offering it in a second.'):av?W('#{1} is also offered in {C} now.',[NO[ap2.id],av+' · '+clName(av)]):W('#{1} is offered in one cluster now.',[NO[ap2.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});return;}
+      offer2(ap2,av).then(function(ok){if(ok!==false)justed(ap2);Boot.toast(ok===false?W('Give it a first cluster before offering it in a second.'):av?W('#{1} is also offered in {C} now.',[NO[ap2.id],av+' · '+clName(av)]):W('#{1} is offered in one cluster now.',[NO[ap2.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});return;}
     if(t.dataset.cl){var cp=PBY(t.dataset.cl),cv=t.value;if(!cp||(cv&&!clOk(cv)))return;t.disabled=true;
-      putIn(cp,cv).then(function(){Boot.toast(cv?W('#{1} is in {C}.',[NO[cp.id],cv+' · '+clName(cv)]):W('#{1} is not in a cluster now.',[NO[cp.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});return;}
+      putIn(cp,cv).then(function(ch){if(ch)justed(cp);Boot.toast(cv?W('#{1} is in {C}.',[NO[cp.id],cv+' · '+clName(cv)]):W('#{1} is not in a cluster now.',[NO[cp.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});return;}
     if(t.dataset.sel){if(t.checked)S.sel[t.dataset.sel]=1;else delete S.sel[t.dataset.sel];delete SU['sel-msg'];render();return;}
     var g=t.dataset.f&&G(t);if(g){g[t.dataset.f]=t.value;touch();render();}
   }
@@ -4627,11 +4804,11 @@ var Hosts=(function(){
     if(b.dataset.shift){Store.saveConfig({shift:b.dataset.shift}).then(function(){render();Boot.onData();});return;}
     if(b.dataset.cfg){var patch={};patch[b.dataset.cfg]=b.dataset.v==='1';Store.saveConfig(patch).then(function(){render();Boot.onData();});return;}
     if(!a)return;
-    if(a==='accept'){makeGroup(b.dataset.key.split('+'),b.dataset.band);S.hgOpen=true;render();}
-    else if(a==='gp'){S.hgOpen=!S.hgOpen;render();}
-    else if(a==='gpx'){S.hgOpen=false;render();}
+    if(a==='accept'){makeGroup(b.dataset.key.split('+'),b.dataset.band);setHg(true);render();}
+    else if(a==='gp'){setHg(!S.hgOpen);render();if(S.hgOpen){var hx=box0().querySelector('.hgp .hgx');if(hx)try{hx.focus({preventScroll:true});}catch(x){}}}
+    else if(a==='gpx'){setHg(false);render();var fb2=box0().querySelector('.hgfab');if(fb2)try{fb2.focus({preventScroll:true});}catch(x){}}
     else if(a==='dismiss'){d.dismissed.push(b.dataset.key);touch();render();}
-    else if(a==='group'){makeGroup(Object.keys(S.sel));S.hgOpen=true;render();}
+    else if(a==='group'){makeGroup(Object.keys(S.sel));setHg(true);render();}
     else if(a==='clearsel'){S.sel={};delete SU['sel-msg'];render();}
     else if(a==='selok'){delete SU['sel-msg'];render();}
     else if(a==='putsel'){var pc=SU['sel-cl']||'',ptb=SU['sel-tb']||'',pids=Object.keys(S.sel).filter(function(id){var x=PBY(id);return x&&x.st!=='gone'&&!isAside(x);});
@@ -4720,6 +4897,28 @@ var Hosts=(function(){
     else if(a==='twoclear'){Store.tableSet(b.dataset.id,{star:null}).then(function(){render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');});}
     else if(a==='lockset'||a==='locknow'){var lk=a==='locknow'||b.dataset.v==='1';if(a==='locknow'&&!S.sureLock){S.sureLock=true;b.textContent=W('Sure? Yes, lock it now');return;}S.sureLock=false;if(!!S.cfg.lock===lk){render();return;}
       Store.saveConfig({lock:lk}).then(function(){Boot.toast(lk?W('The final wording is locked.'):W('The final wording is open for changes again.'));render();Boot.onData();},function(){Boot.toast('That didn’t save. Try again.');render();});}
+    else if(a==='h-reword'){var rw=PBY(b.dataset.id);if(!rw||!S.host||rw.ex)return;Boot.tab('map');Win.edit(rw);var rt=$('#f-text');if(rt)rt.focus();}
+    else if(a==='h-note'){var hnp=PBY(b.dataset.id);if(!hnp||!S.host)return;S.hAct=S.hAct&&S.hAct.id===hnp.id&&S.hAct.k==='note'?null:{id:hnp.id,k:'note'};delete SU['hn-text'];render();var hnt=$('#hn-text');if(hnt)hnt.focus();}
+    else if(a==='hn-x'){S.hAct=null;delete SU['hn-text'];render();}
+    else if(a==='h-fin'||a==='h-finx'){var fp=PBY(b.dataset.id);if(!fp||!canFin(fp))return;var fo2=finOf(fp);if(a==='h-fin'?fo2:!fo2)return;
+      if(a==='h-finx'&&S.finSure!==fp.id){S.finSure=fp.id;render();return;}S.finSure=null;b.disabled=true;
+      Store.tableSet(fp.id,{},{by:'The hosts',add:[{k:a==='h-fin'?'fin':'finx'}]}).then(function(){Boot.toast(a==='h-fin'?W('Marked: the final wording of #{1} is agreed.',[NO[fp.id]]):W('The mark is undone. The wording of #{1} can change again.',[NO[fp.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});}
+    else if(a==='h-wall'){var hwp=PBY(b.dataset.id);if(!hwp)return;S.hostsLast=hwp.id;Boot.tab('wall',{view:'one',k:hwp.id});}
+    else if(a==='h-split'){var hsp=PBY(b.dataset.id);if(!hsp||!canHalve(hsp))return;if(S.hAct&&S.hAct.id===hsp.id&&S.hAct.k==='split'){S.hAct=null;clearSplit();render();return;}
+      openSplit(hsp);render();var hsa=$('#hs-a');if(hsa)hsa.focus();}
+    else if(a==='hs-x'){S.hAct=null;clearSplit();render();}
+    else if(a==='hs-go'){var sp0=PBY(b.dataset.id);if(!sp0||!canHalve(sp0)||S.hBusy)return;var hr=halfPlan(sp0);
+      if(hr.err){SU['hs-msg']=hr.err;render();var hfe=hr.f&&$('#'+hr.f);if(hfe)hfe.focus();return;}
+      S.hBusy=true;delete SU['hs-msg'];render();
+      Store.halve(sp0,{text:hr.t1},hr.np,hr.au,hr.place,hr.note).then(function(){S.hBusy=false;S.hAct=null;clearSplit();
+          var mem=hr.au.m&&S.members[hr.au.m];Store.seedNames([{name:hr.au.name,ids:[hr.np.id]}]).catch(function(){});if(mem&&mem.s)Store.mineAdd(mem.s,[hr.np.id]).catch(function(){});
+          S.hHL={id:hr.np.id,until:Date.now()+3000};
+          Boot.toast(W('Split. #{1} keeps the first half. The second half is #{2}, in {C}.',[NO[sp0.id],NO[hr.np.id],hr.place.cl+' · '+clName(hr.place.cl)])+(hr.place.tab?' '+W('With table {T}.',[hr.place.tab]):''));render();Boot.onData(true);},
+        function(){S.hBusy=false;SU['hs-msg']=W('That didn’t save. Try again.');render();});}
+    else if(a==='hn-go'){var hq=PBY(b.dataset.id),hv=String(SU['hn-text']||'').replace(/\s+/g,' ').trim().slice(0,200);if(!hq||!S.host)return;
+      if(hv.length<2){Boot.toast(W('Type the note first.'));var hn1=$('#hn-text');if(hn1)hn1.focus();return;}
+      if(logFull(hq.id)){Boot.toast(W('This proposal’s story is full, so no more notes can be added to it.'));return;}
+      b.disabled=true;Store.tableSet(hq.id,{},{by:'The hosts',add:[{k:'note',v:hv}]}).then(function(){S.hAct=null;S.hJust=null;delete SU['hn-text'];Boot.toast(W('Note saved on #{1}. The member can read it.',[NO[hq.id]]));render();Boot.onData(true);},function(){Boot.toast('That didn’t save. Try again.');render();});}
     else if(a==='aside'){S.asideAt=S.asideAt===b.dataset.id?null:b.dataset.id;delete SU['aside-why'];render();var aw=$('#aside-why');if(aw)aw.focus();}
     else if(a==='story'){Boot.tab('wall',{view:'one',k:b.dataset.id});}
     else if(a==='aside-x'){S.asideAt=null;delete SU['aside-why'];render();}
@@ -4767,7 +4966,7 @@ var Hosts=(function(){
       try{navigator.clipboard.writeText(sl.text).then(function(){m2.textContent=said;},function(){m2.textContent=W('Copying isn’t allowed here. Use the download instead.');});}catch(x){m2.textContent=W('Copying isn’t allowed here. Use the download instead.');}}
     else if(a==='dlcsv'){var m3=$('#csv-msg');saveFile('sitting-proposals.csv',csv()).then(function(r){if(m3)m3.textContent=r==='cancelled'?W('The download was cancelled.'):r==='fail'?W('The download didn’t start. Try again.'):'';});}
   }
-  return {render:render,voteText:voteText};
+  return {render:render,voteText:voteText,land:land};
 })();
 
 /* One imagined proposal with a full history: five members' homework drafts, brought together by the hosts,
@@ -4999,6 +5198,7 @@ var Imp=(function(){
   function same(a,b){return norm(a)===norm(b);}   /* the very same sentence */
   function T(p){return TW(p.id)||{};}
   function hasLog(t,k,v){return (t.log||[]).some(function(l){return l.k===k&&(v===undefined||l.v===v);});}
+  function finTxt(p,self){return (self?'its':'#'+NO[p.id]+'’s')+' final wording is agreed, so it was left as it is';}
   function live(p){return !!p&&p.st!=='gone'&&!isAside(p);}
   function parse(text,kind){var j;try{j=JSON.parse(String(text||''));}catch(e){return {err:'That is not the whole file. Copy all of it, from the first { to the last }, and paste it again.'};}
     if(j&&!Array.isArray(j)&&Array.isArray(j.new_drafts))return {err:kind==='history'?'That is the 26 November merge plan, not the history file. Paste it in the merge plan box.':'That does not look like the right file.'};
@@ -5050,6 +5250,7 @@ var Imp=(function(){
       if((t.from||[]).length&&!inLead){skip(no,'other proposals have been brought into it, so it was not made '+what);return null;}
       var hasOpt=!x.opt||(inLead&&optOf(p)===lead.id);
       if(inLead&&inFrom&&(!bg||isBg)&&hasOpt){R.already++;return null;}
+      if(finOf(p)||finOf(lead)){skip(no,finTxt(finOf(p)?p:lead,!!finOf(p)));return null;}
       if(!inLead&&hasLog(t,'split',lead.id)){skip(no,'it was '+what+' and has since been split from it again, so it was left on its own');return null;}
       var L=CLLET[roomOf(lead)]||'',ch={},opt={by:BY};
       if(!inLead){ch.into=lead.id;ch.star=null;if(L&&(t.cl||'')!==L&&!(x.keepCl&&t.cl))ch.cl=L;if(bg)opt.swap={into:''};}
@@ -5067,6 +5268,7 @@ var Imp=(function(){
       if(wf){np.who=wf.who;if(wf.whoX)np.whoX=wf.whoX;else delete np.whoX;}
       var need=!(last&&same(last.t,p.text)&&last.by===BY);   /* the history line is already there if an earlier run stopped between the two saves */
       if(need&&hs.length>=30){skip(no,'its history is full');return null;}
+      if(finOf(p)){skip(no,finTxt(p,true));return null;}
       did('wordings tidied');
       return W_(function(){return (need?Store.tableSet(p.id,{hist:hs.concat([{t:p.text,why:why,by:BY,at:now}])},{by:BY}):Promise.resolve())
         .then(function(){return Store.saveProposal(np,null);}).then(function(){p.text=np.text;p.upd=now;if(wf){p.who=np.who;if(np.whoX)p.whoX=np.whoX;else delete p.whoX;}});});}
@@ -5084,6 +5286,7 @@ var Imp=(function(){
       if(tab&&!t.tab&&hasLog(t,'tab','')){skip(no,'a table has had it and handed it back, so it was left with no table (the plan says table '+tab+')');return null;}
       if(tab&&!t.tab){var c=tabCounts()[tab];if(c&&c.n>=tmax()){skip(no,'table '+tab+' is full, so it was not given this one');return null;}}
       var ch={cl:cl};if(tab&&!t.tab)ch.tab=tab;if((t.cl2||'')!==also)ch.cl2=also||null;
+      if(finOf(p)){skip(no,finTxt(p,true));return null;}
       did(tab?'proposals placed on a table':'proposals placed on a cluster’s reserve list');
       return W_(function(){return Store.tableSet(p.id,ch,{by:BY});});}
     /* ---- not a proposal: set aside, with the one line its author reads ---- */
@@ -5093,6 +5296,7 @@ var Imp=(function(){
       if(hasLog(t,'back')){skip(no,'a host set it aside and has since put it back, so it was not set aside again');return null;}
       if(t.tab){skip(no,'table '+t.tab+' has taken it on, so it was not set aside');return null;}
       if(intoOf(p)){skip(no,'it is part of #'+NO[intoOf(p)]+' now, so it was not set aside');return null;}
+      if(finOf(p)){skip(no,finTxt(p,true));return null;}
       did('proposals set aside');return W_(function(){return Store.tableSet(p.id,{aside:{why:why,by:BY,at:Date.now()}},{by:BY});});}
 
     if(j26)return run26(j26).then(finish);
@@ -5131,6 +5335,7 @@ var Imp=(function(){
         if(tN.tab&&tN.tab!==tab){skip(nNo,'table '+tN.tab+' has it, so it did not take the place of #'+oNo+' on '+tab);return null;}
         if(tO.into&&tO.into!==N.id){skip(oNo,'it is part of #'+(NO[tO.into]||'?')+' now, so it was not moved under #'+nNo);return null;}
         if(!tO.into&&tO.tab!==tab){skip(oNo,(tO.tab?'table '+tO.tab+' has it':'no table has it')+', so #'+nNo+' did not take its place on '+tab);return null;}
+        if(finOf(O)||finOf(N)){skip(finOf(O)?oNo:nNo,finTxt(finOf(O)?O:N,true)+(finOf(O)?' and #'+nNo+' did not take its place':''));return null;}
         if(!tO.into&&(tO.top||tO.star)){skip(oNo,'it is '+(tO.top?'a top pick of table '+tO.tab:'one of the room’s two')+', so it was left as it is and #'+nNo+' did not take its place');return null;}
         var c=tabCounts()[tab];if(!tN.tab&&!tO.into&&c&&c.n>=tmax()){skip(nNo,'table '+tab+' is full, so it did not take the place of #'+oNo);return null;}
         freed[N.id]=1;did('leads that take an older lead’s place on its table (the older one now sits under it)');
@@ -5181,6 +5386,7 @@ var Imp=(function(){
           if(!t.into&&(t.tab||'')===ct.tab&&CLLET[roomOf(p)]===ct.cl){R.already++;freed[p.id]=1;return null;}
           if(t.into!==from.id){skip(no,(t.into?'it is part of #'+(NO[t.into]||'?'):'it stands on its own')+' now, not part of #'+e.from+', so it was left as it is');return null;}
           if(ct.tab){var c=tabCounts()[ct.tab];if(c&&c.n>=tmax()){skip(no,'table '+ct.tab+' is full, so it was not split off onto it');return null;}}
+          if(finOf(from)){skip(no,finTxt(from,false)+' (it was not split off it)');return null;}
           freed[p.id]=1;did('proposals split off to stand on their own');
           return W_(function(){return Store.tableSet(p.id,{into:null,cl:ct.cl,tab:ct.tab,star:null},{by:BY})
             .then(function(){var f=T(from).from||[];return f.indexOf(p.id)<0?null:Store.tableSet(from.id,{from:f.filter(function(x){return x!==p.id;})},{by:BY});});});});})
@@ -5191,6 +5397,7 @@ var Imp=(function(){
           var t=T(p),tt=T(to),inTo=(tt.from||[]).indexOf(p.id)>=0;done[no]=1;
           if(t.into===to.id&&inTo){R.already++;return null;}
           if(t.into!==from.id&&t.into!==to.id){skip(no,(t.into?'it is part of #'+(NO[t.into]||'?'):'it stands on its own')+' now, not part of #'+e.from+', so it was not moved');return null;}
+          if(finOf(from)||finOf(to)){skip(no,finTxt(finOf(from)?from:to,false)+' (it was not moved)');return null;}
           var isb=t.into===from.id?bgOf(p)===from.id:bgOf(p)===to.id,iso=t.into===from.id&&optOf(p)===from.id,add=[],L=CLLET[roomOf(to)]||'';
           if(t.into!==to.id){if(isb)add.push({k:'bg',v:to.id});if(iso)add.push({k:'opt',v:to.id});}
           did('proposals moved from one family to another (each keeps what it was: merged wording, background or option)');
@@ -5684,8 +5891,8 @@ var PV=(function(){
       return {id:p.id,n:p.example?top+1:NO[p.id],k:k,p:p,full:!!p.stage,off:!p.example&&offWall(p)>0,tab:p.example?p.tab:tabOf(p),wt:p.example?'':isW(p),k2:p.example?'':alsoOf(p)};});   /* wt: written at this table and not taken on yet */
     PS=all;PBYID={};PS.forEach(function(q){PBYID[q.id]=q;seen[q.id]=1;});
     PS.forEach(function(q){var o=BR[q.id],c=q.k==='none'?'#FFFFFF':GROUP[q.k].c;
-      if(!o){var b=el('button','pv-b','<i></i><i></i><i></i>');b.dataset.id=q.id;root.appendChild(b);o=BR[q.id]=mk(b,BW0,BH0,{focus:1});o.x=o.tx=W/2;o.y=o.ty=H+70;o.s=o.ts=.4;}
-      o.el.style.setProperty('--c',c);o.el.style.setProperty('--d',DOT[q.k]);o.el.classList.toggle('full',q.full);o.el.classList.toggle('own',isMine(q.p));
+      if(!o){var b=el('button','pv-b','<i></i><i></i><i></i><span class="pv-fin" aria-hidden="true">'+icon('lock')+'</span>');b.dataset.id=q.id;root.appendChild(b);o=BR[q.id]=mk(b,BW0,BH0,{focus:1});o.x=o.tx=W/2;o.y=o.ty=H+70;o.s=o.ts=.4;}
+      o.el.style.setProperty('--c',c);o.el.style.setProperty('--d',DOT[q.k]);o.el.classList.toggle('full',q.full);o.el.classList.toggle('fin',!q.p.example&&!!finOf(q.p));o.el.classList.toggle('own',isMine(q.p));
       o.el.setAttribute('aria-label','Proposal '+q.n+': '+(q.p.text||''));});
     Object.keys(BR).forEach(function(id){if(!seen[id]){var o=BR[id];o.el.remove();OB.splice(OB.indexOf(o),1);delete BR[id];}});
     mineBtn();counts();exI.checked=!!S.examples;exL.hidden=S.mode==='hosted';exL.title=exNote();
@@ -5891,7 +6098,9 @@ var PV=(function(){
   var CHEV='<svg viewBox="0 0 28 14" aria-hidden="true"><path d="M2 2l12 10L26 2" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   function actsHTML(p){var mine=isMine(p),id=esc(p.id);if(p.ex)return '';
     var h=(S.cfg.open&&!mine&&!S.host&&!S.staff&&!Room.sitting(p)?'<button type="button" class="pv-act" data-a="reword" data-id="'+id+'">'+C('aReword')+'</button>':'')+(S.cfg.open||S.host?'<button type="button" class="pv-act" data-a="buildon" data-id="'+id+'">'+C('aBuild')+'</button>':'')+
-      (mine||S.host?'<button type="button" class="pv-act" data-a="edit" data-id="'+id+'">'+C('aEdit')+'</button><button type="button" class="pv-act" data-a="gone" data-id="'+id+'">'+C('aGone')+'</button>':'');
+      (mine||S.host?'<button type="button" class="pv-act" data-a="edit" data-id="'+id+'">'+C('aEdit')+'</button><button type="button" class="pv-act" data-a="gone" data-id="'+id+'">'+C('aGone')+'</button>':'')+
+      (S.host?'<button type="button" class="pv-act" data-a="h-open" data-id="'+id+'">Open in the hosts’ tab</button>'+(canHalve(p)?'<button type="button" class="pv-act" data-a="h-split" data-id="'+id+'">Split in two</button>':'')+
+        '<button type="button" class="pv-act" data-a="h-note" data-id="'+id+'">Add a note</button>':'');
     return h?'<div class="pv-acts">'+h+'</div>':'';}
   function cardHTML(q){var p=q.p,g=GROUP[q.k],c=g?g.c:'#D8DEE6',h;
     if(p.example){   /* the one imagined proposal keeps its own worked history */
@@ -5916,7 +6125,7 @@ var PV=(function(){
       else if(nw.k==='into'){var kp=PBY(nw.id);
         h+='<div class="rm-lines"><p class="rm-ln"><b>'+(nw.bg?'It is kept as background to proposal ':'It is now part of proposal ')+NO[nw.id]+'.</b>'+(kp?' “'+Story.sentence(kp)+'”':'')+'</p></div><div class="pv-acts"><button type="button" class="pv-act fill" data-st="open" data-id="'+esc(nw.id)+'">Open proposal '+NO[nw.id]+'</button></div>';}
       h+=QA.blockHTML(p.id);
-    }else h+='<p class="pv-ct"><span class="pv-kb'+(q.full?' full':'')+'" style="--c:'+c+';--d:'+DOT[q.k]+'"><i></i><i></i><i></i></span>'+(q.full?T('full'):T('part'))+'</p>'+Room.cardHTML(q)+actsHTML(p)+QA.cardHTML(q);
+    }else h+='<p class="pv-ct"><span class="pv-kb'+(q.full?' full':'')+'" style="--c:'+c+';--d:'+DOT[q.k]+'"><i></i><i></i><i></i></span>'+(q.full?T('full'):T('part'))+'</p>'+(function(){var f=finOf(p);return f?'<p class="pv-ct pv-fin-l">'+icon('lock')+'<span>Final wording agreed by '+esc(finBy(f.by))+'</span></p>':'';})()+Room.cardHTML(q)+actsHTML(p)+QA.cardHTML(q);
     h+='<button type="button" class="pv-more" id="pv-more" aria-expanded="false" aria-controls="pv-det"><span>'+T('more')+'</span>'+CHEV+'</button><div class="pv-det" id="pv-det"><div>'+Story.html(p);
     h+='<h3 class="pv-dh">'+T('risksH')+'</h3>';
     if(p.risks.length)p.risks.forEach(function(id){if(RISKS[id])h+='<p class="pv-dr" style="--c:'+GROUP[RISKS[id].g].c+'">'+E('r.'+id+'.t')+'</p>';});else h+='<p class="pv-dp">'+T('noRisk')+'</p>';
@@ -6006,7 +6215,7 @@ var PV=(function(){
     root.addEventListener('scroll',function(){root.scrollLeft=0;root.scrollTop=0;});
   }
   try{window.__PV=V;}catch(e){}
-  return {q:function(id){return PBYID[id]||null;},of:of,inK:inK,go:go,open:openId,yours:yours,rebuild:function(){if(!V.on)return;V.built='';if(V.view==='one')recard();layout();},phone:function(){return phone;},
+  return {q:function(id){return PBYID[id]||null;},dot:function(k){return DOT[k]||DOT.none;},of:of,inK:inK,go:go,open:openId,yours:yours,rebuild:function(){if(!V.on)return;V.built='';if(V.view==='one')recard();layout();},phone:function(){return phone;},
     enter:enter,leave:leave,off:off,sync:sync,retext:retext,on:function(){return V.on;},resize:function(){if(V.on){var was=phone;measure();if(was!==phone)V.built='';snap=true;layout();}},state:V};
 })();
 
@@ -6305,7 +6514,11 @@ var Room=(function(){
 
   /* ---------- the list: what the room view adds to it ---------- */
   function bd(t,c){return '<span class="rm-bd'+(c?' '+c:'')+'">'+t+'</span>';}
-  function topHTML(k,qs){var h='';
+  /* the key to the bricks: an empty brick, a filled one, and the lock */
+  function keyHTML(k){var c=GROUP[k]?GROUP[k].c:'#D8DEE6',d=PV.dot(k),st=' style="--c:'+c+';--d:'+d+'"';
+    return '<div class="pv-key" role="note" aria-label="Key"><span><span class="kbw"><span class="pv-kb"'+st+'><i></i><i></i><i></i></span></span>'+C('dots0')+'</span>'+
+    '<span><span class="kbw"><span class="pv-kb full"'+st+'><i></i><i></i><i></i></span></span>'+C('dots1')+'</span><span><span class="fin-ic">'+icon('lock')+'</span>'+C('dots2')+'</span></div>';}
+  function topHTML(k,qs){var h=keyHTML(k);
     if(locked())h+='<p class="rm-note">'+icon('lock')+'The final wording is locked.</p>';
     if(PK)return h;
     var st=qs.filter(function(q){return !q.p.example&&isStar(q.p);});
@@ -6313,6 +6526,7 @@ var Room=(function(){
     return h;}
   function row(q){var p=q.p,o={cls:'',attr:'',badges:'',tail:''};if(p.example)return PK?{cls:' pk off',attr:' aria-disabled="true"',badges:'',tail:''}:o;
     var t=TW(p.id)||{},n=sugsFor(p.id).length,ks=kin(p.id),b='';
+    if(finOf(p))b+=bd(icon('lock')+'Final wording','fin');
     if(t.top&&t.tab)b+=bd(STAR+'Top pick','top');
     if(t.star)b+=bd('One of the room’s two','two');
     if(t.flag)b+=bd('The table could not agree','flag');
@@ -6398,7 +6612,7 @@ var Room=(function(){
       h+='<div class="wp-h"><p class="wp-hb">'+esc(x.by||'A table')+' · '+esc(rel(x.at))+'</p><p class="wp-ht">'+lcsMark(x.t,next)+'</p>'+(x.why?'<p class="wp-hw">'+esc(x.why)+'</p>':'')+'</div>';}
     return h+'<div class="wp-h"><p class="wp-hb">The first wording</p><p class="wp-ht">'+esc(hs[0].t)+'</p></div>';}
   function wpDraw(){if(!WP||!wp)return;var p=PBY(WP.id);if(!p||p.st==='gone'||isAside(p)){shut();return;}
-    var t=TW(p.id)||{},tab=t.tab||'',k=roomOf(p),g=GROUP[k],can=canWork(p),lead=afterWho(p),sugs=sugsFor(p.id),ks=kin(p.id),into=intoOf(p),boss=S.host||(S.staff&&S.staff.role==='chost'),w=isW(p),wcan=canW(p);
+    var t=TW(p.id)||{},tab=t.tab||'',k=roomOf(p),g=GROUP[k],can=canWork(p),fn0=finOf(p),cf0=canFin(p),lead=afterWho(p),sugs=sugsFor(p.id),ks=kin(p.id),into=intoOf(p),boss=S.host||(S.staff&&S.staff.role==='chost'),w=isW(p),wcan=canW(p);
     if(WP.rest==null||!WP.dirty)WP.rest=lead!==null?lead:p.text;
     var h='<button type="button" class="mdl-x" data-rm="wp-x" aria-label="Close">'+icon('x')+'</button>'+
       '<p class="wp-k" id="wp-k">Proposal '+no(p.id)+' · '+(g?esc(g.n):'Not in a cluster yet')+' · '+(tab?'Table '+tab:w?'Written at table '+w+', not taken on yet':'Not with a table yet')+'</p>';
@@ -6408,7 +6622,9 @@ var Room=(function(){
       if(canClaim(p))h+=claimHTML(p);
       var qb0=QA.blockHTML(p.id);if(qb0)h+='<div class="wp-sec wp-qa">'+qb0+'</div>';
     }else{
-      h+=(locked()?'<p class="notice warn">The final wording is locked. As a host you can still change it.</p>':'')+(into?'<p class="notice">This proposal has been combined into proposal '+no(into)+'.</p>':'');
+      h+=(fn0?'<div class="wp-fin"><p>'+icon('lock')+'<span><b>Final wording agreed by '+esc(finBy(fn0.by))+'</b> · '+esc(rel(fn0.at))+'</span></p>'+(cf0?'<button type="button" class="btn sm ol" data-rm="fin-x">'+(WP.finSure?'Sure? Yes, undo the mark':'Undo')+'</button>':'')+'</div>':
+        cf0?'<div class="wp-row wp-fin0"><button type="button" class="btn sm ol" data-rm="fin">'+icon('lock')+'Mark the final wording as agreed</button><span class="wp-q">'+W('After that, only hosts can change its wording.')+'</span></div>':'')+
+        (locked()?'<p class="notice warn">The final wording is locked. As a host you can still change it.</p>':'')+(into?'<p class="notice">This proposal has been combined into proposal '+no(into)+'.</p>':'');
       /* written at a table and not taken on yet: the table decides, here or on the room's list */
       if(w){var wfull=tabFull(w,p);
         h+='<div class="wp-w"><p><b>Written at table '+w+', not taken on yet.</b> It does not count towards the table’s '+tmax()+' and does not go to the vote until a table takes it on.</p>'+
@@ -6416,12 +6632,13 @@ var Room=(function(){
             (wfull&&!S.host?'<p class="wp-q wp-warn" role="status">Table '+w+' already has '+tabN(w)+', the most a table can take. Hand one back first.</p>':wfull&&WA===p.id?'<p class="wp-q wp-warn" role="status">Table '+w+' already has '+tabN(w)+'. Give it this one anyway?</p>':'')+
             '<p class="wp-q">“Not for our table” leaves it for the rest of the room: any table here can then take it on.</p>'
             :'<p class="wp-q">Table '+w+' decides on this one first: to take it on, or to leave it for the rest of the room.</p>')+'</div>';}
-      h+='<div class="wp-s1"><label class="wp-lead" for="wp-t">'+(lead!==null?'<span data-noedit>'+esc(whoLead(p.who,p.whoX))+' …</span>':'The wording')+'</label><textarea id="wp-t" class="field serif" rows="3" maxlength="260">'+esc(WP.rest)+'</textarea>'+
+      if(fn0&&!S.host)h+='<p class="notice wp-finn">'+W('The final wording is agreed. Undo the mark to change it.')+'</p>';else
+      h+=(fn0?'<p class="notice warn fin-warn">'+icon('lock')+W('This wording was marked final by {N}. Change it only if you must, and say why.',[finBy(fn0.by)])+'</p>':'')+'<div class="wp-s1"><label class="wp-lead" for="wp-t">'+(lead!==null?'<span data-noedit>'+esc(whoLead(p.who,p.whoX))+' …</span>':'The wording')+'</label><textarea id="wp-t" class="field serif" rows="3" maxlength="260">'+esc(WP.rest)+'</textarea>'+
         (p.by&&WHENBY[p.by]?'<p class="wp-q">The deadline stays as it is: '+esc(lcFirst(WHENBY[p.by].l))+'.</p>':'')+'</div>';
       if(sugs.length)h+='<div class="wp-sec"><h3>Suggestions waiting from members <i>'+sugs.length+'</i></h3>'+sugs.map(function(s){
-        return '<div class="wp-sug'+(WP.sug===s.id?' on':'')+'"><p class="wp-hb">'+esc(sugName(s))+(s.tab?' · Table '+s.tab:'')+' · '+esc(rel(s.at))+(WP.sug===s.id?' · in the box now':'')+'</p><p class="wp-ht">'+lcsMark(p.text,s.t)+'</p><div class="mdl-acts"><button type="button" class="btn sm ol" data-rm="usesug" data-s="'+esc(s.id)+'">Put this in the box</button><button type="button" class="link" data-rm="nosug" data-s="'+esc(s.id)+'">Dismiss</button></div></div>';}).join('')+'</div>';
-      h+='<div class="wp-sec"><label class="fl" for="wp-why">One line: why the table changed it'+(t.flag?'':' <span class="opt">or what it can’t agree on</span>')+'</label><input id="wp-why" class="field" maxlength="160" autocomplete="off" value="'+esc(WP.why)+'">'+
-        '<div class="mdl-acts"><button type="button" class="btn" data-rm="agree">The table agrees: save this wording</button>'+(t.flag?'':'<button type="button" class="btn ol" data-rm="flag"'+(w?' disabled':'')+'>The table can’t agree: pass it to the cluster</button>')+'</div>'+
+        return '<div class="wp-sug'+(WP.sug===s.id?' on':'')+'"><p class="wp-hb">'+esc(sugName(s))+(s.tab?' · Table '+s.tab:'')+' · '+esc(rel(s.at))+(WP.sug===s.id?' · in the box now':'')+'</p><p class="wp-ht">'+lcsMark(p.text,s.t)+'</p><div class="mdl-acts">'+(fn0&&!S.host?'<span class="wp-q">The final wording is agreed, so this can’t be used now.</span>':'<button type="button" class="btn sm ol" data-rm="usesug" data-s="'+esc(s.id)+'">Put this in the box</button>')+'<button type="button" class="link" data-rm="nosug" data-s="'+esc(s.id)+'">Dismiss</button></div></div>';}).join('')+'</div>';
+      h+='<div class="wp-sec"><label class="fl" for="wp-why">'+(S.host?'One line: why it changed. Members see this':'One line: why the table changed it')+''+(t.flag?'':' <span class="opt">or what it can’t agree on</span>')+'</label><input id="wp-why" class="field" maxlength="160" autocomplete="off" value="'+esc(WP.why)+'">'+
+        '<div class="mdl-acts">'+(fn0&&!S.host?'':'<button type="button" class="btn" data-rm="agree">The table agrees: save this wording</button>')+(t.flag?'':'<button type="button" class="btn ol" data-rm="flag"'+(w?' disabled':'')+'>The table can’t agree: pass it to the cluster</button>')+'</div>'+
         (w&&!t.flag?'<p class="wp-q wp-warn">Take it on first. Only a proposal a table has taken on can be passed to the cluster.</p>':'')+'</div>';
       /* a fact nobody at the table knows: one line, sent to the experts, who answer between sessions */
       h+='<div class="wp-sec wp-qa"><label class="fl" for="wp-q">A question for the experts</label><div class="wp-row"><input id="wp-q" class="field" maxlength="300" autocomplete="off" placeholder="Something the table needs to know. For example: Who would pay for this?" value="'+esc(WP.q||'')+'"><button type="button" class="btn sm ol" data-rm="q-ask">Send the question</button></div>'+QA.blockHTML(p.id)+'</div>';
@@ -6463,6 +6680,8 @@ var Room=(function(){
       [p.id].concat(kz.opt).map(function(id,i){var x=PBY(id);return '<div class="wp-h"><p class="wp-hb">Option '+(i+1)+' · Proposal '+no(id)+'</p><p class="wp-ht">'+esc(Hosts.voteText(x)||x.text)+'</p></div>';}).join('')+'</div>';
     if(kz.fam.length)h+='<div class="wp-sec"><h3>'+(kz.opt.length?'Also brought into it: '+plural(kz.fam.length,'more wording'):'Brought together from '+(kz.fam.length+1)+' proposals')+'</h3>'+kz.fam.map(wpl).join('')+'</div>';
     if(kz.bg.length)h+='<div class="wp-sec"><h3>Background: '+plural(kz.bg.length,'general proposal')+' behind this one</h3>'+kz.bg.map(wpl).join('')+'</div>';
+    var hn=((t.log||[]).filter(function(l){return l.k==='note';})).reverse();
+    if(hn.length)h+='<div class="wp-sec"><h3>Notes from the hosts</h3>'+hn.map(function(l){return '<div class="wp-h"><p class="wp-hb">'+esc(l.by||'The hosts')+' · '+esc(rel(l.at))+'</p><p class="wp-hw" data-noedit>'+esc(l.v)+'</p></div>';}).join('')+'</div>';
     h+='<div class="wp-sec"><h3>How this changed</h3>'+histHTML(p)+'</div>'+
       (Q(p.id)&&!into?'<p class="wp-foot"><button type="button" class="link" data-rm="page">See its reasoning and risks</button></p>':'');
     var box=$('.wp-box',wp);if(h===box._h)return;
@@ -6502,6 +6721,8 @@ var Room=(function(){
       '<div class="mdl-acts"><button type="submit" class="btn"'+(CB.busy?' disabled':'')+'>Combine</button><button type="button" class="link" data-rm="cb-x">Cancel</button></div>';}
   function cbGo(){if(!CB||CB.busy)return;var keep=PBY(CB.keep),others=CB.ids.filter(function(x){return x!==CB.keep&&PBY(x);}),text=String(CB.text||'').trim().replace(/\s+/g,' ').slice(0,300),n=others.length+1;
     if(!keep||!others.length){cbShut();return;}
+    if(!S.host&&others.some(function(x){return !!finOf(PBY(x));})){Boot.toast(W('One of these has its final wording agreed, so it can’t be combined into another. Ask a host.'));return;}
+    if(!S.host&&finOf(keep)&&text!==keep.text){Boot.toast(W('The final wording of the one you keep is agreed, so its wording can’t change here.'));return;}
     if(text.length<3){Boot.toast('Write the final sentence first.');var ta=$('#cb-t',cb);if(ta)ta.focus();return;}
     CB.busy=true;cbDraw();var by=workBy(),from=((TW(keep.id)||{}).from||[]).concat(others);
     (text!==keep.text?Store.saveWording(keep,{text:text},'Brought together from '+n+' proposals.',by):Promise.resolve())
@@ -6584,13 +6805,19 @@ var Room=(function(){
     else if(a==='bs-top'){k=PBY(d.id);if(!k||!canTop(k))return;s=TW(k.id)||{};if(!s.top&&((tabCounts()[s.tab]||{}).top||0)>=tstars())return;
       Store.tableSet(k.id,{top:s.top?null:true}).then(function(){Boot.onData(true);},fail);}
     /* the work panel */
+    else if((a==='fin'||a==='fin-x')&&p){if(!canFin(p))return;var fo=finOf(p);if(a==='fin'?fo:!fo)return;
+      if(a==='fin-x'&&!WP.finSure){WP.finSure=true;wpDraw();return;}WP.finSure=false;
+      Store.tableSet(p.id,{},{by:workBy(),add:[{k:a==='fin'?'fin':'finx'}]}).then(function(){Boot.toast(a==='fin'?W('Marked: the final wording of #{1} is agreed.',[NO[p.id]]):W('The mark is undone. The wording of #{1} can change again.',[NO[p.id]]));Boot.onData(true);},fail);}
     else if(!p||!(canWork(p)||(a==='move'&&canClaim(p))))return;
     else if(a==='q-ask'){v=String(WP.q||'').replace(/\s+/g,' ').trim().slice(0,300);if(v.length<3){Boot.toast('Type the question first.');var e0=$('#wp-q',wp);if(e0)e0.focus();return;}
       if(WP.busy)return;WP.busy=true;
       Store.askQ({id:rid(12),pid:p.id,t:v,from:'table',by:qBy(),tab:S.staff&&!S.host&&S.staff.ct?S.staff.ct:'',uid:uidNow(),at:Date.now()}).then(function(){if(WP){WP.busy=false;WP.q='';}Boot.toast('Sent. Experts answer between sessions.');wpDraw();},function(){if(WP)WP.busy=false;fail();});}
+    else if(a==='usesug'&&finOf(p)&&!S.host){Boot.toast(W('The final wording is agreed. Undo the mark to change it.'));}
     else if(a==='usesug'){s=S.sugs.filter(function(x){return x.id===d.s;})[0];if(!s)return;var r2=afterWho(Object.assign({},p,{text:s.t}));WP.rest=r2!==null?r2:s.t;WP.sug=s.id;WP.dirty=true;wpDraw();var tb=$('#wp-t',wp);if(tb){try{tb.focus({preventScroll:true});}catch(e){}$('.wp-box',wp).scrollTop=0;}}
     else if(a==='nosug'){s=S.sugs.filter(function(x){return x.id===d.s;})[0];if(s)Store.delSug(s).then(function(){if(WP&&WP.sug===d.s)WP.sug='';Boot.toast('Suggestion dismissed.');},fail);}
+    else if(a==='agree'&&finOf(p)&&!S.host){Boot.toast(W('The final wording is agreed. Undo the mark to change it.'));}
     else if(a==='agree'){v=full(p);if(!v||same(v,p.text)){Boot.toast('Change the wording first, or put a suggestion in the box.');var e1=$('#wp-t',wp);if(e1)e1.focus();return;}
+      if(S.host&&String(WP.why||'').trim().length<3){Boot.toast(W('Say in one line why it changed. Members see this.'));var e1h=$('#wp-why',wp);if(e1h)e1h.focus();return;}
       if(WP.busy)return;WP.busy=true;var used=WP.sug&&S.sugs.filter(function(x){return x.id===WP.sug;})[0];
       Store.saveWording(p,{text:v},WP.why.trim(),workBy()).then(function(){return used?Store.delSug(used):null;}).then(function(){if(!WP)return;WP.busy=false;WP.dirty=false;WP.rest=null;WP.why='';WP.sug='';Boot.toast('Saved. This is the wording now.');wpDraw();Boot.onData(true);},function(){if(WP)WP.busy=false;fail();});}
     else if(a==='flag'){if(isW(p))return;v=WP.why.trim();if(!v){Boot.toast('Say in one line what the table can’t agree on.');var e2=$('#wp-why',wp);if(e2)e2.focus();return;}
@@ -6874,15 +7101,18 @@ var Story=(function(){
 
   /* ---------- the steps, oldest first ---------- */
   function steps(p){var out=[],t=TW(p.id)||{},n=0;
-    function add(at,h,o){o=o||{};out.push({at:+at||0,i:n++,h:h,note:o.note||'',before:o.before||'',after:o.after||'',cls:o.cls||''});}
+    function add(at,h,o){o=o||{};out.push({at:+at||0,i:n++,h:h,note:o.note||'',before:o.before||'',after:o.after||'',cls:o.cls||'',ne:!!o.ne});}
     var par=p.on?PBY(p.on):null,was=logHas(t,'was'),nowL=logHas(t,'now'),again=!!(par&&p.alt&&isAside(par));
     add(p.at,'Sent on '+esc(day(p.at))+(p.src==='paper'?', on paper':'')+(par&&NO[par.id]&&!was&&!again?(p.alt?', as another wording of ':', building on ')+ref(par.id):''));
     if(again&&!was)add(p.at,'It replaced an earlier proposal, '+ref(par.id));   /* written again after being set aside (the line its record should hold, in case that was not saved) */
     var ar=autoRoom(p),wr=wtOf(p);   /* neither line is kept in the log: both are worked out here */
     if(wr)add(p.at,'Written at table '+esc(wr));
     else if(ar!=='none')add(p.at,'It joined the room of its first risk, '+esc(roomName(ar)));
-    (t.hist||[]).forEach(function(x,i,hs){add(x.at,esc(who(x.by))+(x.by==='The hosts'?' tidied the wording':' changed the wording'),{before:x.t,after:i<hs.length-1?hs[i+1].t:p.text,note:x.why});});
-    var tab='',lastTab='';(t.log||[]).forEach(function(l){var w=esc(who(l.by)),v=l.v,isT=/^Table [A-F][1-4]$/.test(l.by);
+    var SPW={},USED={};(t.log||[]).forEach(function(l){if(l.k==='halves')SPW[l.at]=1;});   /* a split: its wording change is told with the split itself */
+    (t.hist||[]).forEach(function(x,i,hs){var aft=i<hs.length-1?hs[i+1].t:p.text;if(x.by==='The hosts'&&SPW[x.at]===1){SPW[x.at]={before:x.t,after:aft};return;}
+      add(x.at,esc(who(x.by))+(x.by==='The hosts'?' tidied the wording':' changed the wording'),{before:x.t,after:aft,note:x.why});});
+    function noteOf(l){var r='';(t.log||[]).some(function(m,j){if(m.k==='note'&&m.at===l.at&&m.by===l.by&&!USED[j]){USED[j]=1;r=String(m.v||'');return true;}return false;});return r;}
+    var tab='',lastTab='';(t.log||[]).forEach(function(l,li){var w=esc(who(l.by)),v=l.v,isT=/^Table [A-F][1-4]$/.test(l.by);
       if(l.k==='cl')add(l.at,v&&CLOF[v]?w+' put it in '+esc(roomName(CLOF[v])):w+' took it out of its cluster');
       else if(l.k==='tab'){if(v)add(l.at,l.by==='Table '+v?'Table '+esc(v)+' took it on':isT?w+' passed it to table '+esc(v):w+' gave it to table '+esc(v));else add(l.at,isT?w+' handed it back':w+' took it back from '+(tab?'table '+esc(tab):'its table'));if(tab)lastTab=tab;tab=v;}
       else if(l.k==='star')add(l.at,v?'Chosen as one of the room’s two':'No longer one of the room’s two');
@@ -6901,6 +7131,11 @@ var Story=(function(){
       else if(l.k==='bgs')add(l.at,'The hosts put '+refs(v)+' behind it as background');
       else if(l.k==='opt')add(l.at,'The hosts made it one of the options beside '+ref(v),{note:'The table chooses between equal options. None is favoured.'});
       else if(l.k==='opts')add(l.at,'The hosts set out a choice for the table: this proposal and '+refs(v)+', as equal options');
+      else if(l.k==='halves'){var hx=SPW[l.at]&&SPW[l.at]!==1?SPW[l.at]:null;add(l.at,'The hosts split it in two. The other half is '+ref(v),{note:noteOf(l),ne:1,before:hx?hx.before:'',after:hx?hx.after:''});}
+      else if(l.k==='halfof')add(l.at,'Split from '+ref(v)+' by the hosts',{note:noteOf(l),ne:1});
+      else if(l.k==='note'){if(!USED[li])add(l.at,'Note from the hosts',{note:String(v||''),ne:1});}
+      else if(l.k==='fin')add(l.at,'Final wording agreed by '+esc(finBy(l.by)));
+      else if(l.k==='finx')add(l.at,v==='split'?'The hosts reopened the wording to split it':w+' reopened the wording');
       else if(l.k==='was')add(l.at,'It replaced an earlier proposal, '+ref(v));
       else if(l.k==='now')add(l.at,'It was written again, as '+ref(v));});
     var gi=groupOf(p);if(gi){var oth=(gi.src||[]).filter(function(x){return x.id!==p.id&&NO[x.id];});
@@ -6923,7 +7158,7 @@ var Story=(function(){
     var h='<div class="pz"><h3 class="pv-dh">How it got here</h3><ol class="pz-l">'+ss.map(function(s){if(s.before)marks=true;
       return '<li class="pz-s'+s.cls+'"><p class="pz-w">'+esc(s.end||when(s.at))+'</p><p class="pz-h">'+s.h+'</p>'+
         (s.before?'<p class="pz-b"><span>Before</span>'+esc(s.before)+'</p><p class="pz-v"><span>After</span>'+lcsMark(s.before,s.after)+'</p>':'')+
-        (s.note?'<p class="pz-note">'+esc(s.note)+'</p>':'')+'</li>';}).join('')+'</ol>'+
+        (s.note?'<p class="pz-note"'+(s.ne?' data-noedit':'')+'>'+esc(s.note)+'</p>':'')+'</li>';}).join('')+'</ol>'+
       (marks?'<p class="pz-key">Highlighted words are what changed from the wording before.</p>':'');
     h+='<h3 class="pv-dh">What is still open</h3>'+(op.length?op.map(function(x){return '<p class="pv-dp">'+x+'</p>';}).join(''):'<p class="pv-dp">Nothing is waiting on this proposal.</p>');
     return h+'</div>';}
@@ -6958,10 +7193,14 @@ var Story=(function(){
     if(!ps.length)return '<p class="yr-none">'+C('mineNone')+'</p>';
     return '<div class="yr-list">'+ps.map(function(x){var p=x.p,t=TW(p.id)||{},nw=now(p),c=counts(p),fresh=isNew(p,map),h,nl=logHas(t,'now'),np=nl&&PBY(nl.v);
       h='<article class="yr-c '+nw.k+'"><button type="button" class="yr-o" data-st="open" data-id="'+esc(p.id)+'" aria-label="Open proposal '+no(p.id)+'">'+
-        '<span class="yr-n">#'+no(p.id)+(isTop(p)?'<span class="top-bd">'+STAR+'Top pick</span>':'')+(fresh?'<i class="yr-new">new</i>':'')+'</span><span class="yr-t">'+sentence(p)+'</span>'+
+        '<span class="yr-n">#'+no(p.id)+(isTop(p)?'<span class="top-bd">'+STAR+'Top pick</span>':'')+(finOf(p)?finBadge():'')+(fresh?'<i class="yr-new">new</i>':'')+'</span><span class="yr-t">'+sentence(p)+'</span>'+
         '<span class="yr-now"><b>Now:</b> '+(nw.k==='into'?(nw.bg?'kept as background to #':nw.opt?'an option beside #':'part of #')+no(nw.id):nw.k==='gone'&&nw.by?'taken down · now carried by #'+no(nw.by):nw.h)+'</span>'+(c.length?'<span class="yr-k">'+c.join(' · ')+'</span>':'')+'</button>';
       var lh=(t.hist||[]).length?t.hist[t.hist.length-1]:null;
-      if(lh&&lh.by==='The hosts'&&nw.k!=='gone')h+='<p class="yr-x">The hosts tidied the wording'+(lh.why?': <span data-noedit>'+esc(lh.why)+'</span>':'.')+'</p>';
+      var sp=null,nl2=null;(t.log||[]).forEach(function(l){if(l.k==='halves'||l.k==='halfof')sp=l;});(t.log||[]).forEach(function(l){if(l.k==='note'&&!(sp&&l.at===sp.at&&l.by===sp.by))nl2=l;});
+      if(lh&&lh.by==='The hosts'&&nw.k!=='gone'&&!(sp&&sp.k==='halves'&&lh.at===sp.at))h+='<p class="yr-x">The hosts tidied the wording'+(lh.why?': <span data-noedit>'+esc(lh.why)+'</span>':'.')+'</p>';
+      if(sp&&nw.k!=='gone'){var spn=hostNoteOf(t,sp);h+='<p class="yr-x">'+(sp.k==='halves'?'The hosts split it in two. The other half is '+ref(sp.v):'Split from '+ref(sp.v)+' by the hosts')+(spn?': <span data-noedit>'+esc(spn)+'</span>':'.')+'</p>';}
+      if(nl2&&nw.k!=='gone')h+='<p class="yr-x">Note from the hosts: <span data-noedit>'+esc(nl2.v)+'</span></p>';
+      var fq=finOf(p);if(fq&&nw.k!=='gone'&&nw.k!=='into'&&nw.k!=='aside')h+='<p class="yr-x yr-fin">'+icon('lock')+'Final wording agreed by '+esc(finBy(fq.by))+'.</p>';
       if(nw.k==='into'){var kp=PBY(nw.id),kt=kp?tabOf(kp):'';if(kp)h+=nw.opt?(function(){var all=[nw.id].concat(optsOf(nw.id)),oth=all.filter(function(x){return x!==p.id;});return '<p class="yr-x">Your proposal is one of '+all.length+' equal options the table chooses between, with '+refs(oth)+(kt?', at table '+esc(kt):'')+'. No option is favoured.</p>';})():nw.bg?'<p class="yr-x">Your proposal is a general aim, so it now sits behind '+ref(nw.id)+' as part of its “why”: <span data-noedit>“'+sentence(kp)+'”</span></p>':
         '<p class="yr-x">Now part of '+ref(nw.id)+(kt?', with table '+esc(kt):'')+': <span data-noedit>“'+sentence(kp)+'”</span> Your own wording is kept underneath it, where the table can read it and use it.</p>';}
       else if(nw.k==='gone'){var dwy=downWhy(p),cp=nw.by?PBY(nw.by):null;if(dwy)h+='<p class="yr-x"><b>The hosts’ reason:</b> <span data-noedit>'+esc(dwy)+'</span></p>';
@@ -7131,6 +7370,7 @@ var Boot=(function(){
     if(TABS.indexOf(name)<0||(name==='who'&&!DEMO))name='map';
     if(HW&&name!=='map'&&name!=='hosts'&&name!=='experts')name='map';   /* the homework page: only Propose is open */
     if(HW&&(name==='hosts'||name==='experts'))document.body.classList.add('hosty');
+    if(S.tab==='hosts'&&name!=='hosts')S.hostsY=window.scrollY;   /* coming back lands where the host was */
     S.tab=name;
     var cz=false,rvw=name==='wall';document.body.classList.toggle('cz',cz);
     TABS.forEach(function(t){$('#v-'+t).hidden=rvw?t!=='map':(t!==name&&!(cz&&t==='map'));});
@@ -7147,9 +7387,10 @@ var Boot=(function(){
     if(name==='who')Who.render();
     if(name==='clusters'){Clus.render();if(cz){Map_.layout();Map_.zoom(GROUP[Clus.k()]?Clus.k():null);}}
     window.scrollTo(0,0);
+    if(name==='hosts')Hosts.land(opt);
   }
   function onData(quiet){
-    stages();Edit.touch();
+    adoptHalves();stages();Edit.touch();
     var n=liveProps().length;$('#tab-n').textContent=n;
     Map_.paint();if(S.tab==='map'){Map_.renderWip();if(!quiet)Win.place();}
     Win.sync();
