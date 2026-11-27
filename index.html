@@ -2462,6 +2462,15 @@ function intoOf(p){var t=TW(p.id),k=t&&t.into&&PBY(t.into);return k&&k.st!=='gon
 /* kept as background: a general proposal that sits behind a specific one as part of its "why". It is brought into that proposal like
    any other (into/from), and its own log says so (k:'bg'), so it reads as background and not as a merged wording. '' when it is not. */
 function bgOf(p){var t=p&&TW(p.id),l=null;if(!t||!t.into)return '';(t.log||[]).forEach(function(x){if(x.k==='bg')l=x;});return l&&l.v===t.into&&intoOf(p)===t.into?t.into:'';}
+/* an equal option: another wording of the same action that the hosts put beside the lead as one of the table's options, none favoured.
+   It is brought in like any other (into/from), and its own log says so (k:'opt', v: the lead); a later split ends it. The lead's log
+   keeps the order the options are shown in (k:'opts'). optOf: the lead it is an option beside, or ''. optsOf: a lead's options, in order. */
+function optOf(p){var t=p&&TW(p.id),l=null;if(!t||!t.into)return '';(t.log||[]).forEach(function(x){if(x.k==='opt')l=x;else if(x.k==='split'||(x.k==='into'&&l&&x.v!==l.v))l=null;});
+  return l&&l.v===t.into&&intoOf(p)===t.into&&!bgOf(p)?t.into:'';}
+function optsOf(id){var t=TW(id),ord=[],out=[];((t&&t.log)||[]).forEach(function(x){if(x.k==='opts'&&Array.isArray(x.v))ord=x.v;});
+  var all=S.props.filter(function(p){return !p.ex&&optOf(p)===id;}).map(function(p){return p.id;});
+  ord.forEach(function(x){if(all.indexOf(x)>=0&&out.indexOf(x)<0)out.push(x);});
+  all.sort(function(a,b){return (NO[a]||0)-(NO[b]||0);}).forEach(function(x){if(out.indexOf(x)<0)out.push(x);});return out;}
 /* a proposal that was taken down: the hosts' reason (null when none was recorded), and the live proposal that carries it now ('' when none) */
 function downWhy(p){var t=p&&TW(p.id),l=null;((t&&t.log)||[]).forEach(function(x){if(x.k==='down')l=x;});return l?String(l.v||''):null;}
 function carrierOf(p){var t=p&&TW(p.id),c='';if(!t)return '';function ok(id){var k=typeof id==='string'&&id&&PBY(id);return k&&k.st!=='gone'&&k.id!==p.id?id:'';}
@@ -2507,7 +2516,7 @@ function saneTable(d){ /* fixed shape, as for proposals */
   var o={id:d.id,tab:tabOk(d.tab)?d.tab:'',hist:[],at:+d.at||0,upd:+d.upd||+d.at||0};
   if(clOk(d.cl))o.cl=d.cl;   /* the cluster a host chose for it */
   if(clOk(d.cl2)&&o.cl&&d.cl2!==o.cl)o.cl2=d.cl2;   /* a second cluster the hosts also offer it in (see alsoOf) */
-  if(Array.isArray(d.hist))o.hist=d.hist.filter(function(h){return h&&typeof h.t==='string';}).slice(-30).map(function(h){var x=line(h);x.t=h.t.slice(0,300);x.why=String(h.why||'').slice(0,200);return x;});
+  if(Array.isArray(d.hist))o.hist=d.hist.filter(function(h){return h&&typeof h.t==='string';}).slice(-30).map(function(h){var x=line(h);x.t=h.t.slice(0,300);x.why=String(h.why||'').slice(0,400);return x;});
   if(d.flag&&typeof d.flag.why==='string'){o.flag=line(d.flag);o.flag.why=d.flag.why.slice(0,200);}
   if(d.res&&typeof d.res.t==='string'){o.res=line(d.res);o.res.t=d.res.t.slice(0,200);}
   if(d.star===true)o.star=true;
@@ -2515,7 +2524,7 @@ function saneTable(d){ /* fixed shape, as for proposals */
   if(d.top===true&&o.tab)o.top=true;   /* a top pick of the table that holds it */
   if(d.wx===true)o.wx=true;   /* written at a table, and no longer waiting on that table: it left it for the room, or took it on and later handed it back */
   if(typeof d.into==='string'&&IDRE.test(d.into)&&d.into!==d.id)o.into=d.into;
-  if(Array.isArray(d.from)){var f=d.from.filter(function(x,i,a){return typeof x==='string'&&IDRE.test(x)&&x!==d.id&&a.indexOf(x)===i;}).slice(0,20);if(f.length)o.from=f;}
+  if(Array.isArray(d.from)){var f=d.from.filter(function(x,i,a){return typeof x==='string'&&IDRE.test(x)&&x!==d.id&&a.indexOf(x)===i;}).slice(0,40);if(f.length)o.from=f;}
   if(d.aside&&typeof d.aside.why==='string'){o.aside=line(d.aside);o.aside.why=d.aside.why.replace(/\s+/g,' ').trim().slice(0,200);}   /* set aside by the hosts, with the one line the member sees */
   if(Array.isArray(d.log)){var lg=d.log.map(saneLog).filter(Boolean).slice(-60);if(lg.length)o.log=lg;}
   return o;
@@ -2534,9 +2543,10 @@ function saneTable(d){ /* fixed shape, as for proposals */
      cl2   the second cluster the hosts also offered it in                      cl2x  the second cluster it is no longer offered in
      down  the hosts' reason for taking it down (the member reads it)
      bg    the id of the proposal it is kept as background to                   bgs   on that proposal, the ids put behind it as background
+     opt   the id of the lead it is an equal option beside                      opts  on that lead, its options in order (Option 2, 3, …)
    by is who did it, in plain words: "The hosts", "Table E2", "The cluster host, People at work". Changes of wording are not here:
    they are in hist. The lines are written in one place only, Store.tableSet, by comparing the record before and after (logDiff). */
-var LOGK={cl:1,tab:1,star:1,broad:1,top:1,flag:1,res:1,into:1,from:1,split:1,aside:1,back:1,was:1,now:1,wx:1,cl2:1,cl2x:1,down:1,bg:1,bgs:1};
+var LOGK={cl:1,tab:1,star:1,broad:1,top:1,flag:1,res:1,into:1,from:1,split:1,aside:1,back:1,was:1,now:1,wx:1,cl2:1,cl2x:1,down:1,bg:1,bgs:1,opt:1,opts:1};
 function saneLog(x){if(!x||typeof x.k!=='string'||!LOGK[x.k])return null;var v=x.v;
   if(Array.isArray(v))v=v.filter(function(y){return typeof y==='string'&&IDRE.test(y);}).slice(0,20);
   else if(v!==true&&v!==false)v=String(v==null?'':v).slice(0,200);
@@ -4161,7 +4171,7 @@ var Hosts=(function(){
     var seedBox=window.SITTING_TEST&&P!=='sit-'?'<div class="logins"><h4>Test copy: fill it with made-up proposals</h4><p style="font-size:14px;color:var(--soft);max-width:70ch">Only on the test copy. It makes 159 proposals in the same order as the real ones, with the same 17 taken down, so every number here matches the live page. The senders are made-up names. Paste the two files into their boxes below first: the proposals they mention then start with the wordings those files expect.</p>'+
       '<div class="rowf"><button type="button" class="btn sm" data-a="imp-seed"'+(S.impBusy?' disabled':'')+'>Fill the test copy</button></div>'+msg('seed')+'</div>':'';
     return seedBox+box('hist','Bring in the tidy history','A one-off. It adds what the hosts changed before this page went live to each proposal’s story: the wording before a tidy, why a proposal was taken down, and which proposal carries it now. Do this one before the merge plan. The file holds numbers and wordings only, no names. Running it again adds nothing twice.','The history file','Bring in the tidy history')+
-      box('plan','Bring in the merge plan','A one-off. It puts the starting proposals on their tables and the reserves in their clusters, tidies the wordings in the plan, brings each family into its lead, puts general proposals behind a specific one as background, and sets aside the ones that are not proposals. The file holds numbers and wordings only, no names. Anything a host or a table has already placed differently is left as it is and listed. Running it again adds nothing twice.','The merge plan file','Bring in the merge plan');}
+      box('plan','Bring in the merge plan','A one-off. It puts the starting proposals on their tables and the reserves in their clusters, tidies the wordings in the plan, brings each family into its lead, puts general proposals behind a specific one as background, and sets aside the ones that are not proposals. It takes the 25 November plan and also the 26 November plan for the new proposals (#160 to #232): paste one file at a time. The file holds numbers and wordings only, no names. Anything a host or a table has already placed differently is left as it is and listed. Running it again adds nothing twice.','The merge plan file','Bring in the merge plan');}
   /* the name a proposal was sent under, as the hosts know it: its author record, or for the copy the name the database holds for its number */
   function nameOf(p){if(p.ex)return S.host&&p.no&&S.exwho[p.no]||'';var a=S.authors[p.id];return a&&a.name||'';}
   function who(p){var a=S.authors[p.id];if(p.ex)return nameOf(p)?'<span data-noedit>'+esc(nameOf(p))+'</span> · in the copy':'Name not in this copy';if(!a)return 'Name not loaded';var lm=a.m&&S.members[a.m];return '<span data-noedit>'+esc(a.name)+'</span>'+(lm&&normName(lm.name)!==normName(a.name)?' (login: <span data-noedit>'+esc(lm.name)+'</span>)':'')+(a.mk==='paper'?' · on paper':a.mk==='unchecked'&&a.m&&S.members[a.m]?' · sent before logins, now under their login':a.mk==='unchecked'?'':a.m&&a.m.charAt(0)==='u'&&S.cfg.pw?' · <b style="color:#C0184F">signed in with the everyone password</b>':' · signed in');}
@@ -4991,20 +5001,23 @@ var Imp=(function(){
   function hasLog(t,k,v){return (t.log||[]).some(function(l){return l.k===k&&(v===undefined||l.v===v);});}
   function live(p){return !!p&&p.st!=='gone'&&!isAside(p);}
   function parse(text,kind){var j;try{j=JSON.parse(String(text||''));}catch(e){return {err:'That is not the whole file. Copy all of it, from the first { to the last }, and paste it again.'};}
+    if(j&&!Array.isArray(j)&&Array.isArray(j.new_drafts))return {err:kind==='history'?'That is the 26 November merge plan, not the history file. Paste it in the merge plan box.':'That does not look like the right file.'};
     if(!j||Array.isArray(j)||!Array.isArray(j.items))return {err:'That does not look like the right file.'};
     if(j.kind!==kind)return {err:kind==='history'?'That is not the history file. Check you pasted it in the right box.':'That is not the merge plan file. Check you pasted it in the right box.'};
     return {items:j.items.filter(function(x){return x&&typeof x==='object'&&Math.round(+x.no)>0;}),gone:j.gone};}
   /* the "who must act" that a new sentence starts with, when it no longer starts with the one on record */
+  /* the 26 Nov plan is a file of its own shape: the new proposals, the leads that change, and a few older ones */
+  function plan26(text){var j;try{j=JSON.parse(String(text||''));}catch(e){return null;}return j&&!Array.isArray(j)&&Array.isArray(j.new_drafts)&&Array.isArray(j.lead_changes)?j:null;}
   function whoFrom(p,text){if(afterWho(Object.assign({},p,{text:text}))!==null)return null;var t=norm(text),low=t.toLowerCase(),best=null;
     WHO.forEach(function(w){if(w.k==='other'||w.k==='house')return;if(low.indexOf((w.l+' must ').toLowerCase())===0)best={who:w.k};});
     if(low.indexOf('the house of the people must ')===0)best={who:'house'};
     if(best)return best;var i=low.indexOf(' must ');return i>0&&i<=40?{who:'other',whoX:t.slice(0,i)}:null;}
 
   function run(kind,text,dry){
-    var R={n:0,already:0,skip:[],did:{}},pr=parse(text,kind==='plan'?'merge-plan':'history');
+    var R={n:0,already:0,skip:[],did:{},notes:[]},j26=kind==='plan'?plan26(text):null,pr=j26?{items:[]}:parse(text,kind==='plan'?'merge-plan':'history');
     if(!S.host)return Promise.resolve({warn:true,head:'Only hosts can do this.',lines:[]});
     if(pr.err)return Promise.resolve({warn:true,head:pr.err,lines:[]});
-    if(!pr.items.length)return Promise.resolve({warn:true,head:'The file holds nothing to bring in.',lines:[]});
+    if(!j26&&!pr.items.length)return Promise.resolve({warn:true,head:'The file holds nothing to bring in.',lines:[]});
     function did(what){R.n++;R.did[what]=(R.did[what]||0)+1;}
     function skip(no,why){R.skip.push('#'+no+': '+why);}
     function W_(fn){return dry?Promise.resolve():fn();}   /* a write, unless this is only a check */
@@ -5027,24 +5040,26 @@ var Imp=(function(){
       if(needWhy)did('take-down reasons added');if(needC)did('“now carried by” links made');
       return W_(function(){return Store.tableSet(p.id,needC?{into:c.id}:{},{by:BY,add:needWhy?[{k:'down',v:why}]:[],swap:{into:''}});});}
     /* ---- bring one proposal into another: as another wording of the same action (a family), or as background to it ---- */
-    function opInto(p,leadNo,bg){var no=NO[p.id],lead=byNo(leadNo),what=bg?'background to #'+leadNo:'part of #'+leadNo;
+    function opInto(p,leadNo,bg,x){x=x||{};var no=NO[p.id],lead=byNo(leadNo),what=bg?'background to #'+leadNo:x.opt?'an option beside #'+leadNo:'part of #'+leadNo;
       if(!live(p)){skip(no,'it has been taken down or set aside, so it was not made '+what);return null;}
       if(!lead||!live(lead)||lead.id===p.id){skip(no,'proposal #'+leadNo+' is not a live proposal, so it was not made '+what);return null;}
-      if(intoOf(lead)){skip(no,'proposal #'+leadNo+' is itself part of #'+NO[intoOf(lead)]+' now, so it was not made '+what);return null;}
+      if(intoOf(lead)&&!(x.free&&x.free[lead.id])){skip(no,'proposal #'+leadNo+' is itself part of #'+NO[intoOf(lead)]+' now, so it was not made '+what);return null;}   /* x.free: a lead this run takes out of the family it was in */
       var t=T(p),lt=T(lead),inLead=t.into===lead.id,isBg=inLead&&hasLog(t,'bg',lead.id),inFrom=(lt.from||[]).indexOf(p.id)>=0;
       if(t.into&&!inLead&&intoOf(p)){skip(no,'it is already part of #'+NO[intoOf(p)]+', so it was not made '+what);return null;}
       if(t.tab&&!inLead){skip(no,'table '+t.tab+' already has it, so it was not made '+what);return null;}
       if((t.from||[]).length&&!inLead){skip(no,'other proposals have been brought into it, so it was not made '+what);return null;}
-      if(inLead&&inFrom&&(!bg||isBg)){R.already++;return null;}
+      var hasOpt=!x.opt||(inLead&&optOf(p)===lead.id);
+      if(inLead&&inFrom&&(!bg||isBg)&&hasOpt){R.already++;return null;}
       if(!inLead&&hasLog(t,'split',lead.id)){skip(no,'it was '+what+' and has since been split from it again, so it was left on its own');return null;}
       var L=CLLET[roomOf(lead)]||'',ch={},opt={by:BY};
-      if(!inLead){ch.into=lead.id;ch.star=null;if(L&&(t.cl||'')!==L)ch.cl=L;if(bg)opt.swap={into:''};}
+      if(!inLead){ch.into=lead.id;ch.star=null;if(L&&(t.cl||'')!==L&&!(x.keepCl&&t.cl))ch.cl=L;if(bg)opt.swap={into:''};}
       if(bg&&!isBg)opt.add=[{k:'bg',v:lead.id}];
-      did(bg?'general proposals put behind a specific one as background':'proposals brought into their family’s lead');
+      if(!hasOpt)opt.add=(opt.add||[]).concat([{k:'opt',v:lead.id}]);
+      did(bg?'general proposals put behind a specific one as background':x.opt?(inLead?'wordings already in a family made equal options beside their lead':'proposals brought in as an equal option beside a lead'):'proposals brought into their family’s lead');
       return W_(function(){return (inFrom?Promise.resolve():Store.tableSet(lead.id,{from:(T(lead).from||[]).concat([p.id])},{by:BY,swap:bg?{from:'bgs'}:null}))
         .then(function(){return (Object.keys(ch).length||opt.add)?Store.tableSet(p.id,ch,opt):null;});});}
     /* ---- a tidier wording: the proposal carries the new sentence, and the one before goes into its history with the reason ---- */
-    function opText(p,e){var no=NO[p.id],nt=norm(e.text).slice(0,300),why=norm(e.why).slice(0,200);if(nt.length<3)return null;
+    function opText(p,e){var no=NO[p.id],nt=norm(e.text).slice(0,300),why=norm(e.why).slice(0,400);if(nt.length<3)return null;
       if(!live(p)){skip(no,'it has been taken down or set aside, so its wording was not changed');return null;}
       if(same(p.text,nt)){R.already++;return null;}
       if(!wordingOk(p,e)){skip(no,'its wording has changed since the plan was written, so it was left as it is now');return null;}
@@ -5063,8 +5078,9 @@ var Imp=(function(){
       var t=T(p);
       if((t.tab||'')===tab&&(t.cl||'')===cl&&(t.cl2||'')===also){R.already++;return null;}
       if(t.tab&&t.tab!==tab){skip(no,'table '+t.tab+' already has it, so it was left there (the plan says '+(tab?'table '+tab:'the '+cl+' reserve')+')');return null;}
-      if(!t.tab&&t.cl&&t.cl!==cl){skip(no,'a host has already put it in cluster '+t.cl+', so it was left there (the plan says '+cl+')');return null;}
-      if(isW(p)){skip(no,'it was written at table '+isW(p)+' and is waiting on that table, so it was left there');return null;}
+      if(!t.tab&&t.cl&&t.cl!==cl&&!(e.w26&&t.cl===e.was)){skip(no,'a host has already put it in cluster '+t.cl+', so it was left there (the plan says '+cl+')');return null;}
+      if(isW(p)&&!e.w26){skip(no,'it was written at table '+isW(p)+' and is waiting on that table, so it was left there');return null;}
+      if(e.w26&&tab&&!t.tab&&t.wx&&wtOf(p)===tab){skip(no,'table '+tab+' wrote it and has left it for the rest of the room, so it was not given back to that table');return null;}
       if(tab&&!t.tab&&hasLog(t,'tab','')){skip(no,'a table has had it and handed it back, so it was left with no table (the plan says table '+tab+')');return null;}
       if(tab&&!t.tab){var c=tabCounts()[tab];if(c&&c.n>=tmax()){skip(no,'table '+tab+' is full, so it was not given this one');return null;}}
       var ch={cl:cl};if(tab&&!t.tab)ch.tab=tab;if((t.cl2||'')!==also)ch.cl2=also||null;
@@ -5079,6 +5095,97 @@ var Imp=(function(){
       if(intoOf(p)){skip(no,'it is part of #'+NO[intoOf(p)]+' now, so it was not set aside');return null;}
       did('proposals set aside');return W_(function(){return Store.tableSet(p.id,{aside:{why:why,by:BY,at:Date.now()}},{by:BY});});}
 
+    if(j26)return run26(j26).then(finish);
+    /* ================= the 26 Nov plan: #160-#232, the leads whose wording changes, and the older proposals it moves =================
+       Each new proposal is found by its number, and its sentence on the page (who must act, what, by when) must be the one in the plan
+       (wall_text_now), or the plan's own new wording when an earlier run already put that in. One that differs is refused and listed, and
+       nothing is done with it. Three or more that differ, or a number the page does not have, mean the file is for other numbers: nothing
+       is changed. Then, in this order: wordings; the two leads that take an older lead's place on its table (#129 for #59 on D1, #222 for
+       #140 on E1); placings; families and equal options; background. Every step is the same kind of step as above, so a second run adds
+       nothing, a run that stopped half-way can be run again, and anything a host or a table has since placed differently is listed. */
+    function run26(j){
+      function n_(e){return Math.round(+(e&&e.no))||0;}
+      function P(e){return byNo(n_(e));}
+      function ctab(v){v=String(v||'');var m=/^([A-F])-reserve$/.exec(v);if(m)return {cl:m[1],tab:''};return tabOk(v)?{cl:v.charAt(0),tab:v}:null;}
+      var D=j.new_drafts.filter(function(e){return e&&n_(e)>0;}),LC=j.lead_changes.filter(function(e){return e&&n_(e)>0;}),OC=(Array.isArray(j.older_changes)?j.older_changes:[]).filter(function(e){return e&&n_(e)>0;});
+      var wrong=[],bad={},nbad=0;
+      D.forEach(function(e){var no=n_(e),p=byNo(no);if(!p){wrong.push('#'+no+' is not a proposal on this page');return;}
+        if(p.st==='gone'){bad[no]='it has been taken down, so nothing was done with it';return;}
+        var nw=e.new_wording?norm(e.new_wording).slice(0,300):'';
+        if(e.wall_text_now&&!eq(Hosts.voteText(p)||p.text,e.wall_text_now)&&!(nw&&same(p.text,nw))){bad[no]='its wording on the page is not the wording in the plan, so nothing was done with it';nbad++;}});
+      LC.concat(OC).forEach(function(e){var p=P(e);if(!p)wrong.push('#'+n_(e)+' is not a proposal on this page');});
+      D.forEach(function(e){[e.family_lead,e.backs].forEach(function(l){if(l&&!byNo(l))wrong.push('#'+l+', which #'+n_(e)+' joins, is not a proposal on this page');});});
+      if(nbad>=3)Object.keys(bad).forEach(function(k){if(bad[k].indexOf('wording')>=0)wrong.push('#'+k+': the wording on the page is not the wording in the plan');});
+      if(wrong.length)return Promise.resolve({warn:true,n:0,already:0,skipped:0,refused:wrong.length,head:'Stopped: this plan was made for other proposals than this page has. Nothing has been changed. Tell Claude.',lines:wrong.slice(0,12).concat(wrong.length>12?['… and '+(wrong.length-12)+' more']:[])});
+      Object.keys(bad).sort(function(a,b){return a-b;}).forEach(function(k){skip(k,bad[k]);});
+      function ok(e){return !bad[n_(e)];}
+      var done={},willOpt={},optOrder=[],freed={},FROM26=+window.IMP26_FROM||Date.UTC(2026,10,26,17,0,0);   /* when the plan was written; the tests set their own */
+      function underOf(id){return S.props.filter(function(x){var tx=!x.ex&&TW(x.id);return !!tx&&tx.into===id;});}
+      /* ---- a new lead takes an older lead's place on its table; the older one, and anything under it, goes under the new one ---- */
+      function relead(O,N,tab){var tO=T(O),tN=T(N),oNo=NO[O.id],nNo=NO[N.id],L=tab.charAt(0);
+        var under=underOf;done[nNo]=1;
+        if(!live(O)||!live(N)){skip(oNo,'it or #'+nNo+' has been taken down or set aside, so #'+nNo+' did not take its place');return null;}
+        var left=under(O.id).filter(function(x){return x.id!==N.id;});left.forEach(function(x){done[NO[x.id]]=1;});
+        if(tO.into===N.id&&(tN.from||[]).indexOf(O.id)>=0&&tN.tab===tab&&!tN.into&&!left.length){R.already++;return null;}
+        if(tN.into&&tN.into!==O.id){skip(nNo,'it is part of #'+(NO[tN.into]||'?')+' now, so it did not take the place of #'+oNo);return null;}
+        if(tN.tab&&tN.tab!==tab){skip(nNo,'table '+tN.tab+' has it, so it did not take the place of #'+oNo+' on '+tab);return null;}
+        if(tO.into&&tO.into!==N.id){skip(oNo,'it is part of #'+(NO[tO.into]||'?')+' now, so it was not moved under #'+nNo);return null;}
+        if(!tO.into&&tO.tab!==tab){skip(oNo,(tO.tab?'table '+tO.tab+' has it':'no table has it')+', so #'+nNo+' did not take its place on '+tab);return null;}
+        if(!tO.into&&(tO.top||tO.star)){skip(oNo,'it is '+(tO.top?'a top pick of table '+tO.tab:'one of the room’s two')+', so it was left as it is and #'+nNo+' did not take its place');return null;}
+        var c=tabCounts()[tab];if(!tN.tab&&!tO.into&&c&&c.n>=tmax()){skip(nNo,'table '+tab+' is full, so it did not take the place of #'+oNo);return null;}
+        freed[N.id]=1;did('leads that take an older lead’s place on its table (the older one now sits under it)');
+        return W_(function(){
+          return ((tN.into||tN.tab!==tab)?Store.tableSet(N.id,{into:null,tab:tab,cl:L,star:null},{by:BY,swap:{split:''}}):Promise.resolve())
+            .then(function(){var t=T(O);if(t.into===N.id)return null;
+              return Store.tableSet(O.id,{tab:'',into:N.id,cl:L,star:null,top:null,from:(t.from||[]).filter(function(x){var tx=TW(x);return x!==N.id&&!(tx&&tx.into===O.id);})},{by:BY,swap:{tab:'',split:''}});})
+            .then(function(){return seq(under(O.id),function(x){if(x.id===N.id)return null;var tx=T(x),isb=hasLog(tx,'bg',O.id)&&bgOf(x)===O.id,iso=optOf(x)===O.id,add=[];
+              if(isb)add.push({k:'bg',v:N.id});if(iso)add.push({k:'opt',v:N.id});return Store.tableSet(x.id,{into:N.id},{by:BY,add:add,swap:isb?{into:''}:null});});})
+            .then(function(){var f=T(N).from||[],nu=under(N.id).filter(function(x){return f.indexOf(x.id)<0;}),pl=nu.filter(function(x){return !bgOf(x);}).map(function(x){return x.id;}),bb=nu.filter(function(x){return !!bgOf(x);}).map(function(x){return x.id;});
+              return (pl.length?Store.tableSet(N.id,{from:f.concat(pl)},{by:BY}):Promise.resolve()).then(function(){return bb.length?Store.tableSet(N.id,{from:(T(N).from||[]).concat(bb)},{by:BY,swap:{from:'bgs'}}):null;});});});}
+      /* ---- the order a lead's equal options are shown in: one line on the lead, written again only when the order changes ---- */
+      function opOrder(L){var lead=byNo(L),ids=(willOpt[L]||[]).filter(function(id){return !!PBY(id);});if(!lead||!ids.length)return null;
+        var last=null;((T(lead).log)||[]).forEach(function(x){if(x.k==='opts')last=x.v;});
+        if(Array.isArray(last)&&(last.join()===ids.join()||last.some(function(id){return ids.indexOf(id)<0;}))){R.already++;return null;}
+        did('choices set out for a table, with their options in order');return W_(function(){return Store.tableSet(lead.id,{},{by:BY,add:[{k:'opts',v:ids}]});});}
+      function famItem(e,older){var cat=e.category,p=P(e);if(!p)return null;
+        if(cat!=='FAMILY'&&cat!=='FAMILY-CHOICE')return null;return {p:p,lead:Math.round(+e.family_lead),opt:cat==='FAMILY-CHOICE'};}
+      function leadBad(no,l){if(!bad[l])return false;skip(no,'#'+l+', which it joins, was refused (its wording is not the one in the plan), so it was not joined to it');return true;}
+      function joinOne(x){if(leadBad(NO[x.p.id],x.lead))return null;var k0=R.skip.length,r=opInto(x.p,x.lead,false,{opt:x.opt,free:freed});
+        if(x.opt&&R.skip.length===k0){(willOpt[x.lead]=willOpt[x.lead]||[]).push(x.p.id);if(optOrder.indexOf(x.lead)<0)optOrder.push(x.lead);}return r;}
+      return Promise.resolve()
+        /* 1. wordings: the leads that change, and the new leads */
+        .then(function(){return seq(LC,function(e){var p=P(e);if(!p||!e.new_wording)return null;var t=T(p),nw=norm(e.new_wording).slice(0,300),why=norm(e.reason).slice(0,400);
+          var since=(+p.upd||0)>FROM26||(t.hist||[]).some(function(h){return (+h.at||0)>FROM26&&!(h.by===BY&&same(h.why,why));});   /* its own line from a run that stopped part-way does not count */
+          if(!same(p.text,nw)&&since){skip(n_(e),'its wording has been changed since the plan was written, so the plan’s new wording was not put in');return null;}
+          return opText(p,{text:e.new_wording,why:e.reason||''});});})
+        .then(function(){return seq(D.filter(ok),function(e){return e.new_wording?opText(P(e),{text:e.new_wording,why:e.reason||''}):null;});})
+        /* 2. a new lead in an older lead's place */
+        .then(function(){return seq(OC,function(e){var p=P(e),lead=e.family_lead&&byNo(e.family_lead),ct=ctab(e.table);if(done[n_(e)]||!p||!lead||e.category!=='FAMILY'||!ct||!ct.tab)return null;
+          var t=T(p),lt=T(lead);if(!(t.tab||lt.into===p.id||underOf(p.id).length))return null;   /* it still leads: the new lead takes its place (after that, it is an ordinary join, below) */
+          if(leadBad(n_(e),NO[lead.id])){done[n_(e)]=1;return null;}
+          done[n_(e)]=1;return relead(p,lead,ct.tab);});})
+        /* 3. placings: new leads and ready ones on their table or their cluster's reserve, and the older ones the plan moves */
+        .then(function(){return seq(D.filter(ok),function(e){if(done[n_(e)]||(e.category!=='NEW-LEAD'&&e.category!=='READY'))return null;
+          if(/-left$/.test(String(e.table||''))){R.notes.push('#'+n_(e)+' left exactly where it is, as the plan says ('+(e.where_now&&e.where_now.place||'as it was')+'). Its table can still take it on.');return null;}
+          var ct=ctab(e.table);if(!ct){skip(n_(e),'the plan gives it a table this page does not have');return null;}
+          return opPlace(P(e),{cl:ct.cl,tab:ct.tab,also:(Array.isArray(e.also_offer_in)&&e.also_offer_in[0])||'',w26:true,was:e.where_now&&e.where_now.cluster||''});});})
+        .then(function(){return seq(OC,function(e){var p=P(e),ct=e.to&&ctab(e.to);if(!p||!ct)return null;var fr=ctab(e.from_);done[n_(e)]=1;
+          return opPlace(p,{cl:ct.cl,tab:ct.tab,also:T(p).cl2||'',w26:true,was:fr?fr.cl:''});});})
+        /* 4. families, and equal options (new ones first, then the older ones, so Option 2 is the new one where the plan says so) */
+        .then(function(){return seq(D.filter(ok),function(e){var x=famItem(e);return x?joinOne(x):null;});})
+        .then(function(){return seq(OC,function(e){if(done[n_(e)])return null;var x=famItem(e);return x?joinOne(x):null;});})
+        .then(function(){return seq(optOrder,opOrder);})
+        /* 5. background, and the one a host has already put in a cluster of its own (it keeps that cluster) */
+        .then(function(){return seq(D.filter(ok),function(e){return e.category==='BACKGROUND'&&e.backs&&!leadBad(n_(e),Math.round(+e.backs))?opInto(P(e),Math.round(+e.backs),true):null;});})
+        .then(function(){return seq(OC,function(e){return e.category==='BACKGROUND'&&e.backs&&P(e)&&!leadBad(n_(e),Math.round(+e.backs))?opInto(P(e),Math.round(+e.backs),true,{keepCl:true}):null;});})
+        /* 6. what the plan leaves for later, where each lead is against the plan, and the questions still waiting */
+        .then(function(){
+          D.filter(ok).forEach(function(e){if(String(e.category||'').indexOf('WITH-')===0)R.notes.push('#'+n_(e)+' not moved: it waits with #'+e.family_lead+', which is not decided yet.');});
+          LC.forEach(function(e){if(done[n_(e)])return;var p=P(e),ct=ctab(e.table);if(!p||!ct||!live(p))return;var t=T(p),into=intoOf(p);if(into){skip(n_(e),'it is part of #'+NO[into]+', so it is not '+(ct.tab?'on table '+ct.tab:'on the '+ct.cl+' reserve')+' as the plan says');return;}
+            if((t.tab||'')!==ct.tab||(roomOf(p)!==CLOF[ct.cl]))skip(n_(e),'the plan has it '+(ct.tab?'on table '+ct.tab:'on the '+ct.cl+' reserve')+'; it is '+(t.tab?'on table '+t.tab:'in '+roomName(roomOf(p))+' with no table')+', so it was left there');});
+          D.forEach(function(e){var p=P(e);if(!p)return;var qs=S.qs.filter(function(q){return q.pid===p.id&&!q.a&&!q.fresh;}).length;if(!qs)return;var into=intoOf(p);
+            R.notes.push('#'+n_(e)+': '+qs+' question'+(qs===1?'':'s')+' waiting, still with it'+(into?' and shown with #'+NO[into]:'')+'.');});});
+      }
     var wrong=[];if(!window.SITTING_TEST)pr.items.forEach(function(e){var no=Math.round(+e.no),p=byNo(no);if(!p||typeof e.at!=='number'||!(e.at>0)||!e.now)return;
       if(p.at!==e.at&&!eq(p.text,e.now))wrong.push('#'+no+' is not the proposal the file expects at that number');});
     if(wrong.length<3)wrong=[];   /* one or two can be an honest difference; a shift in the numbers shows as many */
@@ -5094,11 +5201,13 @@ var Imp=(function(){
       .then(function(){return each(function(p,e){return e.bg?opInto(p,e.bg,true):null;});});
     else job=each(0).then(function(){return each(function(p,e){
         return Promise.resolve(e.original?opHist(p,e):null).then(function(){return e.down||e.carriedBy?opDown(p,e):null;}).then(function(){return e.bg?opInto(p,e.bg,true):null;});});});
-    return job.then(function(){var lines=Object.keys(R.did).map(function(k){return R.did[k]+' '+k+(dry?' (to do)':'');});
+    return job.then(finish);
+    function finish(x){if(x&&x.refused)return x;var lines=Object.keys(R.did).map(function(k){return R.did[k]+' '+k+(dry?' (to do)':'');});
+      lines=lines.concat(R.notes);
       if(R.skip.length)lines.push('Left alone ('+R.skip.length+'):');lines=lines.concat(R.skip);
       var head=dry?'Checked: '+R.n+' to do, '+R.already+' already in place, '+R.skip.length+' left alone. Nothing has been changed.'
                   :'Done: '+R.n+' made, '+R.already+' were already in place, '+R.skip.length+' left alone.';
-      return {head:head,lines:lines,warn:!!R.skip.length,n:R.n,already:R.already,skipped:R.skip.length};});
+      return {head:head,lines:lines,warn:!!R.skip.length,n:R.n,already:R.already,skipped:R.skip.length};}
   }
   /* The test copy only (…/proposals/test/, data under sitx-): 159 made-up proposals in the order of the real ones, the same ones taken down,
      so the numbers match the live page and both files above can be tried on them. Wordings come from the files' own "now" lines, then from
@@ -6158,7 +6267,8 @@ var Room=(function(){
   function stars(k){return shown(k).filter(function(q){return isStar(q.p);});}
   /* every proposal brought together into this one, however deep */
   /* the proposals brought into p, split: other wordings of the same action (fam), and general ones kept behind it as background (bg) */
-  function kinSplit(id){var fam=[],bg=[];kin(id).forEach(function(k){var x=PBY(k);(x&&bgOf(x)===id?bg:fam).push(k);});return {fam:fam,bg:bg};}
+  function kinSplit(id){var fam=[],bg=[],ks=kin(id),opt=optsOf(id).filter(function(k){return ks.indexOf(k)>=0;});
+    ks.forEach(function(k){var x=PBY(k);if(opt.indexOf(k)>=0)return;(x&&bgOf(x)===id?bg:fam).push(k);});return {fam:fam,bg:bg,opt:opt};}
   function kin(id,seen){seen=seen||{};seen[id]=1;var t=TW(id),out=[];((t&&t.from)||[]).forEach(function(x){if(seen[x]||!PBY(x))return;var tx=TW(x);if(!tx||tx.into!==id)return;out.push(x);out=out.concat(kin(x,seen));});return out;}
   function fail(){Boot.toast('That didn’t save. Try again.');}
   function seq(list,fn){var i=0;return (function next(){if(i>=list.length)return Promise.resolve();return Promise.resolve(fn(list[i++])).then(next);})();}
@@ -6183,7 +6293,7 @@ var Room=(function(){
     if(n)b+=bd(plural(n,'suggestion')+' waiting','sug');
     var qc=QA.countsFor(p.id);if(qc.wait)b+=bd(plural(qc.wait,'question')+' waiting','q');if(qc.ans)b+=bd(qc.ans+' answered','qa');
     if(t.broad)b+=bd('Broad','broad');
-    var kz=kinSplit(p.id);if(kz.fam.length)b+=bd('Brought together from '+(kz.fam.length+1)+' proposals');if(kz.bg.length)b+=bd(plural(kz.bg.length,'background proposal'));
+    var kz=kinSplit(p.id);if(kz.opt.length)b+=bd('A choice: '+(kz.opt.length+1)+' options');if(kz.fam.length)b+=bd(kz.opt.length?plural(kz.fam.length,'more wording'):'Brought together from '+(kz.fam.length+1)+' proposals');if(kz.bg.length)b+=bd(plural(kz.bg.length,'background proposal'));
     if(b)o.badges='<span class="rm-bds">'+b+'</span>';
     if(PK){var on=!!PK.sel[p.id];o.cls=' pk'+(on?' on':'');o.attr=' role="checkbox" aria-checked="'+on+'"';o.tail='<span class="rm-tick" aria-hidden="true">'+icon('tick')+'</span>';}
     return o;}
@@ -6323,7 +6433,9 @@ var Room=(function(){
         (ks.length?'<div class="wp-row"><button type="button" class="btn sm ol" data-rm="split">Split up again</button><span class="wp-q">Puts the proposals that were combined into this one back on their own.</span></div>':'')+'</div>';
     }
     var kz=kinSplit(p.id);function wpl(id){var x=PBY(id);return '<div class="wp-h"><p class="wp-hb">Proposal '+no(id)+'</p><p class="wp-ht">'+esc(x.text)+'</p></div>';}
-    if(kz.fam.length)h+='<div class="wp-sec"><h3>Brought together from '+(kz.fam.length+1)+' proposals</h3>'+kz.fam.map(wpl).join('')+'</div>';
+    if(kz.opt.length)h+='<div class="wp-sec"><h3>A choice for the table: '+(kz.opt.length+1)+' equal options</h3><p class="wp-q">No option is favoured. The table chooses one, or agrees its own wording from them.</p>'+
+      [p.id].concat(kz.opt).map(function(id,i){var x=PBY(id);return '<div class="wp-h"><p class="wp-hb">Option '+(i+1)+' · Proposal '+no(id)+'</p><p class="wp-ht">'+esc(Hosts.voteText(x)||x.text)+'</p></div>';}).join('')+'</div>';
+    if(kz.fam.length)h+='<div class="wp-sec"><h3>'+(kz.opt.length?'Also brought into it: '+plural(kz.fam.length,'more wording'):'Brought together from '+(kz.fam.length+1)+' proposals')+'</h3>'+kz.fam.map(wpl).join('')+'</div>';
     if(kz.bg.length)h+='<div class="wp-sec"><h3>Background: '+plural(kz.bg.length,'general proposal')+' behind this one</h3>'+kz.bg.map(wpl).join('')+'</div>';
     h+='<div class="wp-sec"><h3>How this changed</h3>'+histHTML(p)+'</div>'+
       (Q(p.id)&&!into?'<p class="wp-foot"><button type="button" class="link" data-rm="page">See its reasoning and risks</button></p>':'');
@@ -6375,14 +6487,16 @@ var Room=(function(){
   function mineSug(s){return (!!s.uid&&s.uid===uidNow())||(S.mode!=='hosted'&&!s.uid&&!!S.me.name&&normName(s.by)===normName(S.me.name.split(/\s+/)[0]));}
   function cardHTML(q){var p=q.p;if(p.example)return '';var t=TW(p.id)||{},h='',ks=kin(p.id),sugs=sugsFor(p.id),sg=SG[p.id]||{},lead=afterWho(p),lines='';
     /* what sits under it: other members' wordings of the same action (the table can choose between them), and general proposals kept as background */
-    var bgk=ks.filter(function(id){var x=PBY(id);return !!x&&bgOf(x)===p.id;}),fam=ks.filter(function(id){return bgk.indexOf(id)<0;});
+    var bgk=ks.filter(function(id){var x=PBY(id);return !!x&&bgOf(x)===p.id;}),optk=optsOf(p.id).filter(function(id){return ks.indexOf(id)>=0;}),fam=ks.filter(function(id){return bgk.indexOf(id)<0&&optk.indexOf(id)<0;});
     function under(id){var x=PBY(id);return '<p><small>Proposal '+no(id)+'</small>'+esc(x.text)+'</p>';}
     if(t.top&&t.tab)lines+='<p class="rm-ln top">'+STAR+'A top pick of table '+esc(t.tab)+'.</p>';
     if(t.star)lines+='<p class="rm-ln two">One of this room’s two for the House.</p>';
     if(t.broad)lines+='<p class="rm-ln">Broad: it covers the whole map.</p>';
     if(t.flag)lines+='<p class="rm-ln flag"><b>The table could not agree.</b> <span data-noedit>'+esc(t.flag.why)+'</span> It is with the cluster now.</p>';
     if(t.res)lines+='<p class="rm-ln"><b>What the cluster decided:</b> <span data-noedit>'+esc(t.res.t)+'</span></p>';
-    if(fam.length)lines+='<details class="rm-from"><summary>Brought together from '+(fam.length+1)+' proposals</summary>'+fam.map(under).join('')+'</details>';
+    if(optk.length)lines+='<details class="rm-from rm-opt" open><summary>A choice for the table: '+(optk.length+1)+' equal options</summary><p><small>No option is favoured. The table chooses one, or agrees its own wording from them.</small></p>'+
+      [p.id].concat(optk).map(function(id,i){var x=PBY(id);return '<p><small>Option '+(i+1)+' · Proposal '+no(id)+'</small>'+esc(Hosts.voteText(x)||x.text)+'</p>';}).join('')+'</details>';
+    if(fam.length)lines+='<details class="rm-from"><summary>'+(optk.length?'Also brought into it: '+plural(fam.length,'more wording'):'Brought together from '+(fam.length+1)+' proposals')+'</summary>'+fam.map(under).join('')+'</details>';
     if(bgk.length)lines+='<details class="rm-from rm-bg"><summary>Background: '+plural(bgk.length,'general proposal')+' behind this one</summary>'+bgk.map(under).join('')+'</details>';
     if(locked())lines+='<p class="rm-ln lock">The final wording is locked.</p>';
     if(lines)h+='<div class="rm-lines">'+lines+'</div>';
@@ -6759,6 +6873,8 @@ var Story=(function(){
       else if(l.k==='wx')add(l.at,(tabOk(v)?'Table '+esc(v):'Its table')+' left it for the rest of the room');
       else if(l.k==='bg')add(l.at,'The hosts kept it as background to '+ref(v),{note:'It is a general aim, so it sits behind that proposal as part of its “why”.'});
       else if(l.k==='bgs')add(l.at,'The hosts put '+refs(v)+' behind it as background');
+      else if(l.k==='opt')add(l.at,'The hosts made it one of the options beside '+ref(v),{note:'The table chooses between equal options. None is favoured.'});
+      else if(l.k==='opts')add(l.at,'The hosts set out a choice for the table: this proposal and '+refs(v)+', as equal options');
       else if(l.k==='was')add(l.at,'It replaced an earlier proposal, '+ref(v));
       else if(l.k==='now')add(l.at,'It was written again, as '+ref(v));});
     var gi=groupOf(p);if(gi){var oth=(gi.src||[]).filter(function(x){return x.id!==p.id&&NO[x.id];});
@@ -6790,7 +6906,7 @@ var Story=(function(){
   function now(p){var t=TW(p.id)||{},into;
     if(p.st==='gone'){var cb=carrierOf(p);return {k:'gone',h:'taken down'+(cb?' · now carried by '+ref(cb):''),by:cb};}
     if(t.aside)return {k:'aside',h:'set aside by the hosts'};
-    if((into=intoOf(p)))return bgOf(p)?{k:'into',h:'kept as background to '+ref(into),id:into,bg:true}:{k:'into',h:'part of '+ref(into),id:into};
+    if((into=intoOf(p)))return bgOf(p)?{k:'into',h:'kept as background to '+ref(into),id:into,bg:true}:optOf(p)?{k:'into',h:'an option beside '+ref(into),id:into,opt:true}:{k:'into',h:'part of '+ref(into),id:into};
     if(notForward(p))return {k:'nf',h:'not taken forward this weekend'};
     var k=roomOf(p);if(k==='none')return {k:'none',h:'not in a cluster yet'};
     var w=isW(p);if(w)return {k:'room',h:'in '+esc(roomName(k))+', written at table '+esc(w)+', not taken on yet',wrote:w};
@@ -6817,10 +6933,10 @@ var Story=(function(){
     return '<div class="yr-list">'+ps.map(function(x){var p=x.p,t=TW(p.id)||{},nw=now(p),c=counts(p),fresh=isNew(p,map),h,nl=logHas(t,'now'),np=nl&&PBY(nl.v);
       h='<article class="yr-c '+nw.k+'"><button type="button" class="yr-o" data-st="open" data-id="'+esc(p.id)+'" aria-label="Open proposal '+no(p.id)+'">'+
         '<span class="yr-n">#'+no(p.id)+(isTop(p)?'<span class="top-bd">'+STAR+'Top pick</span>':'')+(fresh?'<i class="yr-new">new</i>':'')+'</span><span class="yr-t">'+sentence(p)+'</span>'+
-        '<span class="yr-now"><b>Now:</b> '+(nw.k==='into'?(nw.bg?'kept as background to #':'part of #')+no(nw.id):nw.k==='gone'&&nw.by?'taken down · now carried by #'+no(nw.by):nw.h)+'</span>'+(c.length?'<span class="yr-k">'+c.join(' · ')+'</span>':'')+'</button>';
+        '<span class="yr-now"><b>Now:</b> '+(nw.k==='into'?(nw.bg?'kept as background to #':nw.opt?'an option beside #':'part of #')+no(nw.id):nw.k==='gone'&&nw.by?'taken down · now carried by #'+no(nw.by):nw.h)+'</span>'+(c.length?'<span class="yr-k">'+c.join(' · ')+'</span>':'')+'</button>';
       var lh=(t.hist||[]).length?t.hist[t.hist.length-1]:null;
       if(lh&&lh.by==='The hosts'&&nw.k!=='gone')h+='<p class="yr-x">The hosts tidied the wording'+(lh.why?': <span data-noedit>'+esc(lh.why)+'</span>':'.')+'</p>';
-      if(nw.k==='into'){var kp=PBY(nw.id),kt=kp?tabOf(kp):'';if(kp)h+=nw.bg?'<p class="yr-x">Your proposal is a general aim, so it now sits behind '+ref(nw.id)+' as part of its “why”: <span data-noedit>“'+sentence(kp)+'”</span></p>':
+      if(nw.k==='into'){var kp=PBY(nw.id),kt=kp?tabOf(kp):'';if(kp)h+=nw.opt?(function(){var all=[nw.id].concat(optsOf(nw.id)),oth=all.filter(function(x){return x!==p.id;});return '<p class="yr-x">Your proposal is one of '+all.length+' equal options the table chooses between, with '+refs(oth)+(kt?', at table '+esc(kt):'')+'. No option is favoured.</p>';})():nw.bg?'<p class="yr-x">Your proposal is a general aim, so it now sits behind '+ref(nw.id)+' as part of its “why”: <span data-noedit>“'+sentence(kp)+'”</span></p>':
         '<p class="yr-x">Now part of '+ref(nw.id)+(kt?', with table '+esc(kt):'')+': <span data-noedit>“'+sentence(kp)+'”</span> Your own wording is kept underneath it, where the table can read it and use it.</p>';}
       else if(nw.k==='gone'){var dwy=downWhy(p),cp=nw.by?PBY(nw.by):null;if(dwy)h+='<p class="yr-x"><b>The hosts’ reason:</b> <span data-noedit>'+esc(dwy)+'</span></p>';
         if(cp)h+='<p class="yr-x">Now carried by '+ref(cp.id)+': <span data-noedit>“'+sentence(cp)+'”</span></p>';}
